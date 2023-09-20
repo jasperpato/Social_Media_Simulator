@@ -7,4 +7,4 @@ class Post():
 		self.opinions = opinions
 
 	def __repr__(self) -> str:
-		return 'Post\n' + np.array2string(self.opinions)
+		return f'{self.__class__.__name__} {np.array2string(self.opinions)}'

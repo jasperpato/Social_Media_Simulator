@@ -8,11 +8,11 @@ class Agent():
 		self.opinions = opinions or get_random_opinions()
 
 	def __repr__(self) -> str:
-		return 'Agent\n' + np.array2string(self.opinions)
+		return f'{self.__class__.__name__} {np.array2string(self.opinions)}'
 	
-	def generate_post(self, noise=POST_GEN_NOISE) -> Post:
-		'''returns a Post that aligns with the Agent's opinions +/i a random float in [-noise, noise)'''
-		return Post(self.opinions + noise * (2 * np.random.rand(NUM_OPINIONS) - 1))
+	def generate_post(self) -> Post:
+		'''returns a Post that aligns with the Agent's opinions +/- a random float in [-noise, noise)'''
+		return Post(self.opinions + POST_GEN_NOISE * (2 * np.random.rand(NUM_OPINIONS) - 1))
 	
 if __name__ == '__main__':
 	print(Agent())
