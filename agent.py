@@ -19,4 +19,3 @@ class Agent():
 
 if __name__ == '__main__':
 	a = Agent()
-	a.generate_post()
