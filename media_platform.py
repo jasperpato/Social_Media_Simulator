@@ -16,6 +16,9 @@ class MediaPlatform():
 		returns probabilities of choosing each post for an agent
 		each probability is related to the similarity between the post's opinions and the platform's
 		and the similarity between the post's opinions and the agent's
+
+		Maybe should do uniform prob + weighted similarities, no post should have zero prob
+		Or Rank similarities, prob is based on rank
 		'''
 		values = [PLATFORM_INFLUENCE * norm_similarity(p.opinions, self.opinions) + (1 - PLATFORM_INFLUENCE) * norm_similarity(p.opinions, a.opinions) for p in self.posts]
 		total = sum(values)
