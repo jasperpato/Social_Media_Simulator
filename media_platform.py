@@ -19,7 +19,8 @@ class MediaPlatform():
 		'''
 		values = [PLATFORM_INFLUENCE * norm_similarity(p.opinions, self.opinions) + (1 - PLATFORM_INFLUENCE) * norm_similarity(p.opinions, a.opinions) for p in self.posts]
 		total = sum(values)
-		return [v / total for v in values]
+		l = len(values)
+		return [v / total if total else 1/l for v in values]
 
 	def choose_posts(self, a: Agent):
 		return np.random.choice(self.posts, size=POSTS_PER_DAY, p=self.get_probs(a))
