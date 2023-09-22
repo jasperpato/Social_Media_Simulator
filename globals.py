@@ -1,4 +1,5 @@
-NUM_AGENTS = 1000
+NUM_DAYS = 10
+NUM_AGENTS = 10
 NUM_OPINIONS = 10
 
 # making posts
