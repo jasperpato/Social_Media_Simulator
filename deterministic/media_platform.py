@@ -2,14 +2,13 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-NUM_AGENTS = 100
+NUM_AGENTS     = 100
 NUM_TIME_STEPS = 100
 
-K = 10 # degree of regular graph
-B = 0.1 # probability biased
-
-P = 0.6 # probability of a signal supporting ground truth 
-Q = 0.7 # rejection probability for biased agents
+K = 10  # degree of regular graph
+B = 0.1 # probability of an agent being biased
+P = 0.5 # probability of an agent's initial orientation being 1
+Q = 0.5 # probability of a biased agent rejecting an incongruent signal
 
 # ghost node numbers
 POS_GHOST = NUM_AGENTS
@@ -18,24 +17,12 @@ NEG_GHOST = NUM_AGENTS + 1
 class MediaPlatform():
 	
 	def __init__(self):
-		self.graph = nx.random_regular_graph(K, NUM_AGENTS)
+		self.graph = nx.random_regular_graph(K, NUM_AGENTS) # only used to assign neighbours
 		self.signal_mixes = np.random.binomial(1, P, NUM_AGENTS)
 		self.biases = np.random.binomial(1, B, NUM_AGENTS)
-
-		self.update_orientations()
-
-		# add ghost nodes
-		self.graph.add_node(POS_GHOST)
-		self.graph.add_node(NEG_GHOST)
-
-		# add edges between agents and ghost nodes
-		for n in self.graph:
-			if n not in [POS_GHOST, NEG_GHOST]:
-				self.graph.add_edge(n, POS_GHOST)
-				self.graph.add_edge(n, NEG_GHOST)
-
 		self.polarisations = []
 
+		self.update_orientations()
 		self.construct_matrix()
 		print(self.A)
 
@@ -48,10 +35,6 @@ class MediaPlatform():
 		'''
 		self.A = np.identity(NUM_AGENTS + 2)
 
-		# ghost nodes
-		self.A[POS_GHOST][POS_GHOST] = K + 1
-		self.A[NEG_GHOST][NEG_GHOST] = K + 1
-
 		# loop through rows of matrix
 		for r in range(NUM_AGENTS):
 			# loop through neighbours
@@ -61,6 +44,10 @@ class MediaPlatform():
 			# connect to corresponding ghost node
 			if self.biases[r]:
 				self.A[r][POS_GHOST if self.orientations[r] == 1 else NEG_GHOST] = K * Q
+		
+		# ghost nodes
+		self.A[POS_GHOST][POS_GHOST] = K + 1
+		self.A[NEG_GHOST][NEG_GHOST] = K + 1
 
 		self.A /= K + 1
 
@@ -70,8 +57,8 @@ class MediaPlatform():
 		'''
 		for r in range(NUM_AGENTS):
 			if self.biases[r]:
-				self.A[r][POS_GHOST] = 1 if self.orientations[r] == 1 else 0
-				self.A[r][NEG_GHOST] = 0 if self.orientations[r] == 1 else 1
+				self.A[r][POS_GHOST] = K * Q / (K + 1) if self.orientations[r] == 1 else 0
+				self.A[r][NEG_GHOST] = 0 if self.orientations[r] == 1 else K * Q / (K + 1)
 
 	def polarisation(self):
 		'''
