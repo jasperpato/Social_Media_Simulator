@@ -2,19 +2,14 @@ import random
 import networkx as nx
 from agent import Agent
 import matplotlib.pyplot as plt
-
-NUM_AGENTS = 20
-NUM_TIME_STEPS = 100
-
-K = 6
-PROBABILITY_BIASED = 0.1
+from globals import *
 
 class MediaPlatform():
 	
 	def __init__(self):
 		self.graph = nx.random_regular_graph(K, NUM_AGENTS)
 		for n in self.graph:
-				self.graph.nodes[n]['self'] = Agent(is_biased=random.random() < PROBABILITY_BIASED)
+				self.graph.nodes[n]['self'] = Agent(is_biased=random.random() < B)
 
 		self.polarisations = []
 

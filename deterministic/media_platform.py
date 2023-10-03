@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 NUM_AGENTS     = 1000
-NUM_TIME_STEPS = 1000
+NUM_TIME_STEPS = 100
 
 K = 100 # degree of regular graph
 B = 0.1 # probability of an agent being biased
