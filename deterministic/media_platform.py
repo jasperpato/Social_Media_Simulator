@@ -1,13 +1,12 @@
-import random
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-NUM_AGENTS = 10
+NUM_AGENTS = 100
 NUM_TIME_STEPS = 100
 
-K = 4 # degree of regular graph
-B = 0.4 # probability biased
+K = 10 # degree of regular graph
+B = 0.1 # probability biased
 
 P = 0.6 # probability of a signal supporting ground truth 
 Q = 0.7 # rejection probability for biased agents
@@ -65,21 +64,28 @@ class MediaPlatform():
 
 		self.A /= K + 1
 
-	def fraction_positive(self):
+	def update_matrix(self):
 		'''
-		Returns the fraction of agents with positive orientation
+		Switch biased agents' ghost nodes edge weight if their orientation has changed
 		'''
-		return len([n for n in self.graph if self.graph.nodes[n]['self'].orientation == 1]) / NUM_AGENTS
-	
+		for r in range(NUM_AGENTS):
+			if self.biases[r]:
+				self.A[r][POS_GHOST] = 1 if self.orientations[r] == 1 else 0
+				self.A[r][NEG_GHOST] = 0 if self.orientations[r] == 1 else 1
+
 	def polarisation(self):
 		'''
 		The fraction of agents of the minority orientation
 		'''
-		f = self.fraction_positive()
+		f = len([o for o in self.orientations if o == 1]) / NUM_AGENTS
 		return min([f, 1-f])
 
 	def time_step(self):
 		self.polarisations.append(self.polarisation())
+		print(self.signal_mixes)
+		self.signal_mixes = np.dot(self.A, np.append(self.signal_mixes, [1, 0]))[:NUM_AGENTS] # append ghost nodes to signal mix vector
+		self.update_orientations()
+		self.update_matrix()
 
 	def simulate(self):
 		for i in range(NUM_TIME_STEPS):
@@ -92,5 +98,5 @@ class MediaPlatform():
 
 if __name__ == '__main__':
 	m = MediaPlatform()
-	# m.simulate()
-	# m.graph_polarisations()
+	m.simulate()
+	m.graph_polarisations()
