@@ -2,10 +2,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-NUM_AGENTS     = 100
-NUM_TIME_STEPS = 100
+NUM_AGENTS     = 1000
+NUM_TIME_STEPS = 1000
 
-K = 10  # degree of regular graph
+K = 100 # degree of regular graph
 B = 0.1 # probability of an agent being biased
 P = 0.5 # probability of an agent's initial orientation being 1
 Q = 0.5 # probability of a biased agent rejecting an incongruent signal
@@ -24,7 +24,6 @@ class MediaPlatform():
 
 		self.update_orientations()
 		self.construct_matrix()
-		print(self.A)
 
 	def update_orientations(self):
 		self.orientations = np.array([1 if self.signal_mixes[i] > 0.5 else -1 for i in range(NUM_AGENTS)])
@@ -69,7 +68,6 @@ class MediaPlatform():
 
 	def time_step(self):
 		self.polarisations.append(self.polarisation())
-		print(self.signal_mixes)
 		self.signal_mixes = np.dot(self.A, np.append(self.signal_mixes, [1, 0]))[:NUM_AGENTS] # append ghost nodes to signal mix vector
 		self.update_orientations()
 		self.update_matrix()
@@ -86,4 +84,5 @@ class MediaPlatform():
 if __name__ == '__main__':
 	m = MediaPlatform()
 	m.simulate()
+	print(m.polarisations[-1])
 	m.graph_polarisations()
