@@ -32,7 +32,7 @@ class MediaPlatform():
 			
 			for n1 in self.graph[n0]: # loop through the node's neighbours
 				neighbour = self.graph.nodes[n1]['self']
-				agent.receive_sums(neighbour)
+				agent.receive_mix(neighbour.avg_mix)
 			
 			agent.update_orientation()
 		
