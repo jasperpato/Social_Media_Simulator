@@ -49,6 +49,7 @@ class MediaPlatform():
 		fig, ax = plt.subplots()
 		ax.plot(self.polarisations, label='Polarisation')
 		ax.plot(self.positives, label='Fraction positive')
+		ax.plot([1-p for p in self.positives], label='Fraction negative')
 		ax.legend()
 		plt.show(block=True)
 

@@ -2,6 +2,6 @@ NUM_AGENTS = 100
 NUM_TIME_STEPS = 100
 
 K = 8
-B = 0.1
-P = 0.5
+B = 0.5
+P = 0.6
 Q = 0.5
