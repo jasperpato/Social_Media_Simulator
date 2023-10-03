@@ -34,6 +34,9 @@ class Agent:
         self.signal_sums[ind_congruent] += neighbour.signal_sums[ind_congruent]
         
         # signals that do not align (may get rejected)
+
+        print(self.signal_sums)
+        
         num_rejected = np.random.binomial(neighbour.signal_sums[ind_incongruent], REJECTION_PROBABILITY)
         self.signal_sums[ind_congruent] += num_rejected
         self.signal_sums[ind_incongruent] += neighbour.signal_sums[ind_incongruent] - num_rejected

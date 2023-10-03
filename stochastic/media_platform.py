@@ -4,9 +4,9 @@ from agent import Agent
 import matplotlib.pyplot as plt
 
 NUM_AGENTS = 20
-NUM_TIME_STEPS = 5
+NUM_TIME_STEPS = 100
 
-K = 5
+K = 6
 PROBABILITY_BIASED = 0.1
 
 class MediaPlatform():
