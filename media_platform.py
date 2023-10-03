@@ -4,10 +4,10 @@ from agent import Agent
 import matplotlib.pyplot as plt
 
 NUM_AGENTS = 20
-NUM_TIME_STEPS = 10
+NUM_TIME_STEPS = 5
 
 K = 5
-PROBABILITY_BIASED = 0.2
+PROBABILITY_BIASED = 0.1
 
 class MediaPlatform():
 	
@@ -48,11 +48,11 @@ class MediaPlatform():
 			print(f'Time step {i}')
 			self.time_step()
 
-	def graph(self):
+	def graph_polarisations(self):
 		plt.plot(self.polarisations)
 		plt.show(block=True)
 
 if __name__ == '__main__':
 	m = MediaPlatform()
 	m.simulate()
-	m.graph()
+	m.graph_polarisations()

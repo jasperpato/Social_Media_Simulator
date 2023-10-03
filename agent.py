@@ -11,7 +11,7 @@ class Agent:
         where p is the probability of s_i matching X. I.e., P(s_i = +1 | X = +1)
         '''
         self.is_biased = is_biased
-        self.signal_sums = [0, 1] if p < np.random.random() else [1, 0]
+        self.signal_sums = np.array([0, 1] if p < np.random.random() else [1, 0])
         self.update_orientation()
 
     def receive_sums(self, neighbour: 'Agent'):
