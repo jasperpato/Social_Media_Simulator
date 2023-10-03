@@ -12,6 +12,7 @@ class MediaPlatform():
 				self.graph.nodes[n]['self'] = Agent(is_biased=random.random() < B)
 
 		self.polarisations = []
+		self.positives = []
 
 	def fraction_positive(self):
 		'''
@@ -36,6 +37,7 @@ class MediaPlatform():
 			
 			agent.update_orientation()
 		
+		self.positives.append(self.fraction_positive())
 		self.polarisations.append(self.polarisation())
 
 	def simulate(self):
@@ -44,7 +46,10 @@ class MediaPlatform():
 			self.time_step()
 
 	def graph_polarisations(self):
-		plt.plot(self.polarisations)
+		fig, ax = plt.subplots()
+		ax.plot(self.polarisations, label='Polarisation')
+		ax.plot(self.positives, label='Fraction positive')
+		ax.legend()
 		plt.show(block=True)
 
 if __name__ == '__main__':
