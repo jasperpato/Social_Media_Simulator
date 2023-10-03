@@ -2,13 +2,13 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-NUM_AGENTS     = 10e4
+NUM_AGENTS     = 10e3
 NUM_TIME_STEPS = 10e3
 
-K = 100 # degree of regular graph
+K = 8 # degree of regular graph
 F = 10e-2 # probability of an agent being biased
-P = 0.5 # probability of an agent's initial orientation being 1
-Q = 0.5 # probability of a biased agent rejecting an incongruent signal
+P = 0.53 # probability of an agent's initial orientation being 1
+Q = 1 # probability of a biased agent rejecting an incongruent signal
 
 # ghost node numbers
 POS_GHOST = NUM_AGENTS
