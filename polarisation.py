@@ -2,8 +2,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-NUM_AGENTS     = 10e3
-NUM_TIME_STEPS = 10e3
+NUM_AGENTS     = 1000
+NUM_TIME_STEPS = 1000
 
 K = 8 # degree of regular graph
 F = 10e-2 # probability of an agent being biased
@@ -82,7 +82,7 @@ class Simulation():
 			self.time_step()
 
 	def graph_polarisations(self):
-		plt.plot(self.polarisations, self.average_signal_mixes)
+		plt.plot(self.polarisations)
 		plt.show(block=True)
 
 if __name__ == '__main__':

@@ -1,27 +1,25 @@
-import numpy as np
+import random
 from globals import *
 
 class Agent:
     
-    def __init__(self, is_biased=False):
-        self.is_biased = is_biased
-        self.signal_mixes = [1 if P < np.random.random() else 0]
+    def __init__(self):
+        self.is_poster = random.random() < K
+        self.is_biased = random.random() < B
+        self.signals = [1 if random.random() < P else -1]
         self.update_orientation()
-
-    def incongruent(self, signal_mix):
-        return (signal_mix < 0.5 and self.orientation == 1) or (signal_mix >= 0.5 and self.orientation == -1)
-
-    def receive_mix(self, signal_mix):
-        '''
-        Receives a signal mix from another agent and updates its own signal mix accordingly
-        '''
-        if self.is_biased and self.incongruent(signal_mix):
-            signal_mix += 2 * Q * abs(signal_mix - 0.5) * (self.orientation)
-        self.signal_mixes.append(signal_mix)
 
     def update_orientation(self):
         '''
-        Updates the orientation of the agent based on the signal mix
+        Current orientation is equal to the most common signal received
         '''
-        self.avg_mix = sum(self.signal_mixes) / len(self.signal_mixes)
-        self.orientation = 1 if self.avg_mix > 0.5 else -1
+        self.orientation = 1 if sum(self.signals) / len(self.signals) >= 0 else -1
+
+    def receive_signal(self, signal):
+        '''
+        Receives a signal from another agent
+        '''
+        if signal != self.orientation and self.is_biased and random.random() < Q:
+            self.signals.append(self.orientation)
+            return
+        self.signals.append(signal)
