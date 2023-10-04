@@ -34,9 +34,9 @@ class MediaPlatform():
 		plt.show(block=True)
 
 if __name__ == '__main__':
-	m = MediaPlatform()
+	m = MediaPlatform(-1)
 
 	try: m.simulate()
 	except KeyboardInterrupt: pass
-	
+
 	m.graph()
