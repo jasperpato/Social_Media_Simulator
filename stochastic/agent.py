@@ -19,7 +19,7 @@ class Agent:
         '''
         Receives a signal from another agent
         '''
-        if signal != self.orientation and self.is_biased and random.random() < Q:
+        if self.is_biased and signal != self.orientation and random.random() < Q:
             self.signals.append(self.orientation)
             return
         self.signals.append(signal)

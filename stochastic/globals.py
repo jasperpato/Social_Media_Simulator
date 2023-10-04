@@ -1,4 +1,4 @@
-NUM_AGENTS = 1000
+NUM_AGENTS = 500
 NUM_TIME_STEPS = 100
 
 K = 0.3 # proportion of posting agents

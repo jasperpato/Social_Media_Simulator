@@ -21,6 +21,7 @@ class MediaPlatform():
 		for a in self.agents:
 			for p in self.posts:
 				a.receive_signal(p)
+			a.update_orientation()
 		self.positives.append(self.fraction_positive())
 
 	def simulate(self):
@@ -34,5 +35,8 @@ class MediaPlatform():
 
 if __name__ == '__main__':
 	m = MediaPlatform()
-	m.simulate()
+
+	try: m.simulate()
+	except KeyboardInterrupt: pass
+	
 	m.graph()
