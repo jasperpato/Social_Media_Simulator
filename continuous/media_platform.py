@@ -1,4 +1,3 @@
-import random
 from agent import Agent
 import matplotlib.pyplot as plt
 from globals import *
@@ -20,6 +19,13 @@ class MediaPlatform():
 			print(f'Time step {i}')
 			self.time_step()
 
+	def summary(self):
+		pos = len([a for a in self.agents if a.opinion == 1])
+		neg = len([a for a in self.agents if a.opinion == -1])
+
+		print(f'Fraction positive {pos / NUM_AGENTS}')
+		print(f'Fraction negative {neg / NUM_AGENTS}')
+
 	def graph(self):
 		fig, ax = plt.subplots()
 		for i, a in enumerate(self.agents):
@@ -31,5 +37,7 @@ if __name__ == '__main__':
 
 	try: m.simulate()
 	except KeyboardInterrupt: pass
+
+	m.summary()
 
 	m.graph()

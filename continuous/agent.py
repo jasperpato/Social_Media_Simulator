@@ -9,9 +9,9 @@ class Agent:
         self.opinions = [self.opinion]
 
     def consume_post(self, opinion):
-
-        if self.opinion == 0 and opinion != 0:
-            self.opinion += D if opinion > 0 else -D
+        if self.opinion == 0:
+            if opinion != 0:
+                self.opinion += D if opinion > 0 else -D
         else:
             diff = abs(opinion - self.opinion)
             if np.random.binomial(1, (1 - diff if diff < 1 else diff - 1)):
