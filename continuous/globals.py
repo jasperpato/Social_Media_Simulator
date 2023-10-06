@@ -1,6 +1,8 @@
 NUM_AGENTS = 100
 NUM_TIME_STEPS = 500
 
+CONVERGENCE_NUM = 10 # number of time steps with no change to end the simulation
+
 # ---- parameters -----
 
 P = 0.3 # proportion of posting agents
