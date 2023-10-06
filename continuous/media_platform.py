@@ -27,7 +27,7 @@ class MediaPlatform():
 		plt.show(block=True)
 
 if __name__ == '__main__':
-	m = MediaPlatform(-1)
+	m = MediaPlatform()
 
 	try: m.simulate()
 	except KeyboardInterrupt: pass
