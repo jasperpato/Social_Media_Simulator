@@ -35,11 +35,11 @@ class MediaPlatform():
 		_, ax = plt.subplots()
 		for i, a in enumerate(self.agents):
 			ax.plot(a.opinions, label=str(i))
-		ax.show()
 
 def simulate():
 	m = MediaPlatform()
 	m.simulate()
+	m.graph()
 	return m.fractions()
 
 SIMULATIONS = 20

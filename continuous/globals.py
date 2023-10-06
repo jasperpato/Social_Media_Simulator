@@ -15,5 +15,6 @@ D = 0.1 # value of change in opinion due to a post
 NUM_POSTERS = int(NUM_AGENTS * P)
 POSTS_PER_DAY = int(NUM_POSTERS * C)
 
-M = -(B + 1)/(B - 1)/2
-C = 1 - 2*M
+if B > 0:
+	M = (2 - B)/(2 * B)
+	C = 1 - 2*M

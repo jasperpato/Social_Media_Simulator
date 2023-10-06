@@ -12,7 +12,7 @@ class Agent:
         '''
         Given difference between opinions, return probability of agent's opinion being strengthened
         '''
-        if d <= 1 + B:
+        if d <= 2 - B:
             return 1 - d/2
         else:
             return M*d + C
