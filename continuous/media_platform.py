@@ -4,40 +4,55 @@ from globals import *
 
 class MediaPlatform():
 	
-	def __init__(self, opinion=1):
+	def __init__(self, opinion=1, verbose=False):
 		self.opinion = opinion
-		self.agents = [Agent() for _ in range(NUM_AGENTS)]
+		self.verbose = verbose
+		self.agents = [Agent(is_poster = i < NUM_POSTERS) for i in range(NUM_AGENTS)]
 
 	def time_step(self):
-		self.posts = [a.opinion for a in self.agents if a.is_poster]
+		self.posts = [a.opinion for a in self.agents if a.is_poster][:POSTS_PER_DAY]
 		for a in self.agents:
 			for p in self.posts:
 				a.consume_post(p)
 
 	def simulate(self):
 		for i in range(NUM_TIME_STEPS):
-			print(f'Time step {i}')
+			if self.verbose:
+				print(f'Time step {i}')
 			self.time_step()
 
-	def summary(self):
+	def fractions(self):
 		pos = len([a for a in self.agents if a.opinion == 1])
 		neg = len([a for a in self.agents if a.opinion == -1])
 
-		print(f'Fraction positive {pos / NUM_AGENTS}')
-		print(f'Fraction negative {neg / NUM_AGENTS}')
+		if self.verbose:
+			print(f'Fraction positive {pos / NUM_AGENTS}')
+			print(f'Fraction negative {neg / NUM_AGENTS}')
+
+		return [pos, neg]
 
 	def graph(self):
-		fig, ax = plt.subplots()
+		_, ax = plt.subplots()
 		for i, a in enumerate(self.agents):
 			ax.plot(a.opinions, label=str(i))
-		plt.show(block=True)
+		ax.show()
+
+def simulate():
+	m = MediaPlatform()
+	m.simulate()
+	return m.fractions()
+
+SIMULATIONS = 20
 
 if __name__ == '__main__':
-	m = MediaPlatform()
+	fractions = []
+	try:
+		for i in range(SIMULATIONS):
+			f = simulate()
+			fractions.append(f)
 
-	try: m.simulate()
-	except KeyboardInterrupt: pass
+	except KeyboardInterrupt:
+		pass
 
-	m.summary()
-
-	m.graph()
+	print(fractions)
+	plt.show(block=True)

@@ -1,21 +1,34 @@
-import numpy as np
+import random
 from globals import *
 
 class Agent:
     
-    def __init__(self):
-        self.is_poster = np.random.random() < P
-        self.opinion = 2 * np.random.random() - 1
+    def __init__(self, is_poster):
+        self.is_poster = is_poster
+        self.opinion = 2 * random.random() - 1
         self.opinions = [self.opinion]
 
+    def prob_strengthen(self, d):
+        '''
+        Given difference between opinions, return probability of agent's opinion being strengthened
+        '''
+        if d <= 1 + B:
+            return 1 - d/2
+        else:
+            return M*d + C
+
     def consume_post(self, opinion):
+        '''
+        Update agent's opinion given a post
+        '''
         if self.opinion == 0:
             if opinion != 0:
+                # agent is unbiased, go in the direction of the post
                 self.opinion += D if opinion > 0 else -D
         else:
-            diff = abs(opinion - self.opinion)
-            if np.random.binomial(1, (1 - diff if diff < 1 else diff - 1)):
-                 # strengthen opinion
+            d = abs(opinion - self.opinion)
+            if random.random() < self.prob_strengthen(d):
+                # strengthen opinion
                 self.opinion += D if self.opinion > 0 else -D
             else:
                 # weaken opinion
