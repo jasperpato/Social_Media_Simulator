@@ -36,7 +36,7 @@ class MediaPlatform():
 
 	def simulate(self):
 		'''
-		Execute the specified time steps
+		Execute the specified time steps, or until convergence of opinions
 		'''
 		for i in range(NUM_TIME_STEPS):
 			if self.verbose:
@@ -49,14 +49,20 @@ class MediaPlatform():
 		'''
 		Return the fractions of agents holding the extreme opinions [-1, 1]
 		'''
-		pos = len([a for a in self.agents if a.opinion == 1])
-		neg = len([a for a in self.agents if a.opinion == -1])
+		pos = len([a for a in self.agents if a.opinion == 1]) / NUM_AGENTS
+		neg = len([a for a in self.agents if a.opinion == -1]) / NUM_AGENTS
 
 		if self.verbose:
-			print(f'Fraction positive {pos / NUM_AGENTS}')
-			print(f'Fraction negative {neg / NUM_AGENTS}')
+			print(f'Fraction positive {pos}')
+			print(f'Fraction negative {neg}')
 
 		return [pos, neg]
+	
+	def polarisation(self):
+		'''
+		Return polarisation value between [0, 1]
+		'''
+		return min(self.fractions())
 
 	def graph(self):
 		'''
@@ -65,27 +71,3 @@ class MediaPlatform():
 		_, ax = plt.subplots()
 		for i, a in enumerate(self.agents):
 			ax.plot(a.opinions, label=str(i))
-
-def simulate():
-	'''
-	Execute an entire simulation
-	'''
-	m = MediaPlatform()
-	m.simulate()
-	m.graph()
-	return m.fractions()
-
-SIMULATIONS = 20
-
-if __name__ == '__main__':
-	fractions = []
-	try:
-		for i in range(SIMULATIONS):
-			f = simulate()
-			fractions.append(f)
-
-	except KeyboardInterrupt:
-		pass
-
-	print(fractions)
-	plt.show(block=True)
