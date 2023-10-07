@@ -13,7 +13,7 @@ class BiasedMediaPlatform(MediaPlatform):
       def __init__(self, opinion=1, verbose=False):
             super().__init__(opinion, verbose)  
             self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]])
-            self.platform_opinion = random.random() * 2 - 1
+            [self.platform_opinion] = random.sample([-1, 1], 1)
 		
 		
       def serve_posts(self):
@@ -36,7 +36,7 @@ class BiasedMediaPlatform(MediaPlatform):
                   Each agent consumes its own served posts
             '''
             ctc = self.serve_posts().T                                         # transpose to get consumer to creator matrix
-            posts_received = (np.random.rand(NUM_POSTERS, NUM_AGENTS) < ctc)    # return boolean matrix of posts served to each agent
+            posts_received = (np.random.rand(NUM_AGENTS, NUM_POSTERS) < ctc)    # return boolean matrix of posts served to each agent
             self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]])
             for i in range(NUM_AGENTS):
                   posts_i = self.posts[posts_received[i]]
@@ -50,23 +50,26 @@ def simulate():
 	'''
 	Execute an entire simulation
 	'''
-	m = MediaPlatform()
+	m = BiasedMediaPlatform()
 	m.simulate()
 	m.graph()
-	return m.fractions()
+	return (m.fractions(), m.platform_opinion)
 
 SIMULATIONS = 20
 
 if __name__ == '__main__':
-	fractions = []
-	try:
-		for i in range(SIMULATIONS):
-			f = simulate()
-			fractions.append(f)
+      fractions = []
+      platform_opinions = []
+      try:
+            for i in range(SIMULATIONS):
+                  f, opinion = simulate()
+                  fractions.append(f)
+                  platform_opinions.append(opinion)
 
-	except KeyboardInterrupt:
-		pass
+      except KeyboardInterrupt:
+            pass
 
-	print(fractions)
-	plt.show(block=True)
+      print(fractions)
+      print(platform_opinions)
+      plt.show(block=True)
 
