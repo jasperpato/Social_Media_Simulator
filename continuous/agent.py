@@ -21,6 +21,10 @@ class Agent:
         '''
         Update agent's opinion given a post
         '''
+        if self.is_poster:
+            self.opinions.append(self.opinion)
+            return
+
         if self.opinion == 0:
             if opinion != 0:
                 # agent is unbiased, go in the direction of the post
