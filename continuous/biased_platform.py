@@ -5,8 +5,8 @@ import numpy as np
 import random
 from globals import *
 
-PLATFORM_BIAS = 0.5
-RECOMMENDATION_BIAS = 0.5
+PLATFORM_BIAS = 0
+RECOMMENDATION_BIAS = 1
 
 
 class BiasedMediaPlatform(MediaPlatform):
@@ -26,7 +26,9 @@ class BiasedMediaPlatform(MediaPlatform):
             ctc_platform_dist = np.abs(ctc - self.platform_opinion)
             
             ctc = PLATFORM_BIAS * ctc_platform_dist + RECOMMENDATION_BIAS * ctc_consumer_dist
-            ctc = ctc / np.max(ctc, axis=0, keepdims=True)              # normalize with max of each agent's posts
+            best_posts = np.max(ctc, axis=0, keepdims=True)
+            best_posts[np.where(best_posts == 0)] = 1
+            ctc = ctc / best_posts                                       # normalize with max of each agent's posts
             ctc[np.diag_indices(NUM_POSTERS)] = 0                        # posters should not consume their own posts
             return ctc
 
