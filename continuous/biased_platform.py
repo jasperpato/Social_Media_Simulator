@@ -23,9 +23,9 @@ class BiasedMediaPlatform(MediaPlatform):
             ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
                   
             # calculate similarity between creator and consumer opinions
-            ctc_consumer_sim = np.log(np.abs(ctc - self.prev_opinions + sys.float_info.epsilon) / 2)
+            ctc_consumer_sim = 2 - np.abs(ctc - self.prev_opinions) + sys.float_info.epsilon
             # calculate similarity between creator and platform opinions
-            ctc_platform_sim = np.log(np.abs(ctc - self.platform_opinion + sys.float_info.epsilon) / 2)
+            ctc_platform_sim = 2 - np.abs(ctc - self.platform_opinion) + sys.float_info.epsilon
             
             ctc = PLATFORM_BIAS * ctc_platform_sim + RECOMMENDATION_BIAS * ctc_consumer_sim
             ctc = ctc / np.max(ctc, axis=0, keepdims=True)               # normalize with max of each agent's posts
