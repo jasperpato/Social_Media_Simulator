@@ -1,5 +1,5 @@
 NUM_AGENTS = 100
-NUM_TIME_STEPS = 500
+NUM_TIME_STEPS = 10
 
 CONVERGENCE_NUM = 10 # number of time steps with no change to end the simulation
 
