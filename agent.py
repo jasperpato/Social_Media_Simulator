@@ -3,7 +3,12 @@ from globals import *
 
 class Agent:
     
-	def __init__(self, is_poster):
+	def __init__(self, bias=0, is_poster=False):
+		self.bias = bias
+		if self.bias > 0:
+			self.m = (2 - bias) / (2 * bias)
+			self.c = 1 - 2 * self.m
+
 		self.is_poster = is_poster
 		self.opinion = 2 * random.random() - 1
 		self.opinions = [self.opinion]
@@ -12,10 +17,10 @@ class Agent:
 		'''
 		Given difference between opinions, return probability of agent's opinion being strengthened
 		'''
-		if d <= 2 - B:
+		if d <= 2 - self.bias:
 			return 1 - d/2
 		else:
-			return M*d + C
+			return self.m * d + self.c
 
 	def consume_post(self, opinion):
 		'''

@@ -1,14 +1,13 @@
 from agent import Agent
 import matplotlib.pyplot as plt
 from globals import *
+import random
 
 class MediaPlatform():
 	
-	def __init__(self, opinion=1, verbose=False):
-		self.opinion = opinion
+	def __init__(self, bias=0, verbose=False):
 		self.verbose = verbose
-		self.agents = [Agent(is_poster = i < NUM_POSTERS) for i in range(NUM_AGENTS)]
-		
+		self.agents = [Agent(bias=bias, is_poster=i < NUM_POSTERS) for i in range(NUM_AGENTS)]
 		self.prev_opinions = [a.opinion for a in self.agents]
 		self.num_same = 0
 
@@ -16,7 +15,7 @@ class MediaPlatform():
 		'''
 		Each agent consumes the same subset of posts
 		'''
-		self.posts = [a.opinion for a in self.agents if a.is_poster][:POSTS_PER_DAY]
+		self.posts = random.sample([a.opinion for a in self.agents if a.is_poster], POSTS_PER_DAY)
 		for a in self.agents:
 			for p in self.posts:
 				a.consume_post(p)
