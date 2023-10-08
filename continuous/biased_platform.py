@@ -6,7 +6,7 @@ import random
 from globals import *
 import sys
 
-PLATFORM_BIAS = 2
+PLATFORM_BIAS = 1
 RECOMMENDATION_BIAS = 1
 
 
@@ -53,6 +53,8 @@ class BiasedMediaPlatform(MediaPlatform):
 
                   for p in selected_posts:
                         self.agents[i].consume_post(p)
+                  
+                  self.agents[i].opinions.append(self.agents[i].opinion)
 			
 	
 def simulate():

@@ -39,5 +39,3 @@ class Agent:
         
         self.opinion = max(-1, self.opinion)
         self.opinion = min(1, self.opinion)
-
-        self.opinions.append(self.opinion)
