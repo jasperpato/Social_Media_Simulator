@@ -5,17 +5,21 @@ NUM_TIME_STEPS = 1000
 CONVERGENCE_NUM = 10
 
 # proportion of posting agents
-P = 0.3
+P = 0.5
 
 # proportion of posts consumed per day
-C = 1
+C = 0.1
 
 # change in agent's opinion due to a post
 D = 0.1
 
+# biased platform parameters
+PLATFORM_BIAS = 1
+RECOMMENDATION_BIAS = 1
+
 # ---------- simulations ----------
 
-STEP = 0.01
+STEP = 0.1
 BS = [round(STEP * i, 3) for i in range(0, int(1 / STEP) + 1)]
 
 NUM_SIMULATIONS = 500

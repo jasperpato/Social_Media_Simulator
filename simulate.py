@@ -48,16 +48,15 @@ if __name__ == '__main__':
 		# pass
 
 	print(fractions)
-	save(fractions, filename='data/data1.json')
+	save(fractions, filename='data/data2.json')
 
 	x, y = zip(*[(k, round(sum(v) / NUM_SIMULATIONS, 4)) for k, v in fractions.items()])
-	print(x, y)
 
 	fig, ax = plt.subplots()
 	ax.plot(x, y)
 	plt.xlabel('Bias')
 	plt.ylabel('Mean Polarisation')
-	plt.savefig('data/bias-avg.png')
+	plt.savefig('data/bias-avg2.png')
 
 	x, y = zip(*[(k, round(variance(v), 4)) for k, v in fractions.items()])
 
@@ -65,7 +64,7 @@ if __name__ == '__main__':
 	ax.plot(x, y)
 	plt.xlabel('Bias')
 	plt.ylabel('Polarisation Variance')
-	plt.savefig('data/bias-var.png')
+	plt.savefig('data/bias-var2.png')
 
 	# plt.show(block=True)
 	# plt.show(block=True)

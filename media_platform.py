@@ -49,8 +49,8 @@ class MediaPlatform():
 		'''
 		Return the fractions of agents holding the extreme opinions [-1, 1]
 		'''
-		pos = len([a for a in self.agents if a.opinion == 1]) / NUM_AGENTS
-		neg = len([a for a in self.agents if a.opinion == -1]) / NUM_AGENTS
+		pos = len([a for a in self.agents if a.opinion >= 0]) / NUM_AGENTS
+		neg = len([a for a in self.agents if a.opinion < 0]) / NUM_AGENTS
 
 		if self.verbose:
 			print(f'Fraction positive {pos}')
@@ -71,3 +71,10 @@ class MediaPlatform():
 		_, ax = plt.subplots()
 		for i, a in enumerate(self.agents[NUM_POSTERS:]):
 			ax.plot(a.opinions, label=str(i))
+
+if __name__ == '__main__':
+	m = MediaPlatform(bias=0.7)
+	m.simulate()
+	print(m.fractions())
+	m.graph()
+	plt.show(block=True)
