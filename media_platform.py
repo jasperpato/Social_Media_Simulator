@@ -19,13 +19,14 @@ class MediaPlatform():
 		for a in self.agents:
 			for p in self.posts:
 				a.consume_post(p)
+			a.opinions.append(a.opinion)
 
 	def converged(self):
 		'''
 		Return True if no opinions have changed in the last CONVERGENCE_NUM time steps
 		'''
 		opinions = [a.opinion for a in self.agents]
-		if opinions == self.prev_opinions:
+		if opinions[NUM_POSTERS:] == self.prev_opinions[NUM_POSTERS:]:
 			self.num_same += 1
 		else:
 			self.prev_opinions = opinions
@@ -68,5 +69,5 @@ class MediaPlatform():
 		Graph every agent's opinion changing over time
 		'''
 		_, ax = plt.subplots()
-		for i, a in enumerate(self.agents):
+		for i, a in enumerate(self.agents[NUM_POSTERS:]):
 			ax.plot(a.opinions, label=str(i))
