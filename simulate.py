@@ -28,6 +28,9 @@ def simulate(b):
 	# m.graph()
 	return m.polarisation()
 
+def variance(lst):
+	avg = sum(lst) / len(lst)
+	return sum([(x - avg)**2 for x in lst]) / len(lst)
 
 if __name__ == '__main__':
 	fractions = {}
@@ -36,21 +39,33 @@ if __name__ == '__main__':
 			print(b)
 			fractions[b] = []
 			for i in range(NUM_SIMULATIONS):
-				# print(f'bias {b}, trial {i}')
 				f = simulate(b)
 				fractions[b].append(f)
-			fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
+			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
 
 	except KeyboardInterrupt:
-		pass
+		exit()
+		# pass
 
 	print(fractions)
-	save(fractions, filename='data/data3.json')
+	save(fractions, filename='data/data1.json')
 
-	plt.plot(fractions.keys(), fractions.values())
+	x, y = zip(*[(k, round(sum(v) / NUM_SIMULATIONS, 4)) for k, v in fractions.items()])
+	print(x, y)
+
+	fig, ax = plt.subplots()
+	ax.plot(x, y)
 	plt.xlabel('Bias')
-	plt.ylabel('Polarisation')
-	plt.savefig('data/bias-polarisation3.png')
-	plt.show(block=True)
+	plt.ylabel('Mean Polarisation')
+	plt.savefig('data/bias-avg.png')
 
+	x, y = zip(*[(k, round(variance(v), 4)) for k, v in fractions.items()])
+
+	fig, ax = plt.subplots()
+	ax.plot(x, y)
+	plt.xlabel('Bias')
+	plt.ylabel('Polarisation Variance')
+	plt.savefig('data/bias-var.png')
+
+	# plt.show(block=True)
 	# plt.show(block=True)
