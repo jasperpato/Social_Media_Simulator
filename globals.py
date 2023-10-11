@@ -1,12 +1,12 @@
 NUM_AGENTS = 100
-NUM_TIME_STEPS = 10
+NUM_TIME_STEPS = 100
 
 CONVERGENCE_NUM = 10 # number of time steps with no change to end the simulation
 
 # ---- parameters -----
 
 P = 0.3 # proportion of posting agents
-C = 1 # proportion of posts consumed per day
+C = 0.4 # proportion of posts consumed per day
 
 B = 0.3 # level of agents' confirmation bias (between 0 and 1)
 

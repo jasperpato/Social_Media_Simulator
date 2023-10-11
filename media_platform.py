@@ -20,6 +20,7 @@ class MediaPlatform():
 		for a in self.agents:
 			for p in self.posts:
 				a.consume_post(p)
+			a.opinions.append(a.opinion)
 
 	def converged(self):
 		'''
@@ -75,7 +76,7 @@ def simulate():
 	m.graph()
 	return m.fractions()
 
-SIMULATIONS = 20
+SIMULATIONS = 1
 
 if __name__ == '__main__':
 	fractions = []

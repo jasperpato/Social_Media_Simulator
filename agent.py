@@ -22,7 +22,6 @@ class Agent:
         Update agent's opinion given a post
         '''
         if self.is_poster:
-            self.opinions.append(self.opinion)
             return
 
         if self.opinion == 0:
@@ -40,5 +39,3 @@ class Agent:
         
         self.opinion = max(-1, self.opinion)
         self.opinion = min(1, self.opinion)
-
-        self.opinions.append(self.opinion)
