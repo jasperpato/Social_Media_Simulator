@@ -1,4 +1,3 @@
-from media_platform import MediaPlatform
 from agent import Agent
 
 import matplotlib.pyplot as plt
@@ -8,8 +7,8 @@ from globals import *
 import sys
 
 
-class BiasedMediaPlatform():
-	def __init__(self, bias=0, verbose=False):
+class MediaPlatform():
+	def __init__(self, bias=0.7, verbose=False):
 		self.verbose = verbose
 		self.agents = [Agent(bias, i < NUM_POSTERS) for i in range(NUM_AGENTS)]
 		self.prev_opinions = [a.opinion for a in self.agents]
@@ -117,7 +116,7 @@ class BiasedMediaPlatform():
 if __name__ == '__main__':
 	if __name__ == '__main__':
 		np.random.seed(40)
-		m = BiasedMediaPlatform(bias=0.3)
+		m = MediaPlatform(bias=0.3)
 		m.simulate()
 		print(m.fractions())
 		print(m.platform_opinion)
