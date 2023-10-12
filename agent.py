@@ -1,4 +1,4 @@
-import random
+import numpy as np
 from globals import *
 
 class Agent:
@@ -10,7 +10,7 @@ class Agent:
 			self.c = 1 - 2 * self.m
 
 		self.is_poster = is_poster
-		self.opinion = 2 * random.random() - 1
+		self.opinion = 2 * np.random.sample() - 1
 		self.opinions = [self.opinion]
 
 	def prob_strengthen(self, d):
@@ -34,7 +34,7 @@ class Agent:
 				self.opinion += D if opinion > 0 else -D
 		else:
 			d = abs(opinion - self.opinion)
-			if random.random() < self.prob_strengthen(d):
+			if np.random.random() < self.prob_strengthen(d):
 				# strengthen opinion
 				self.opinion += D if self.opinion > 0 else -D
 			else:
