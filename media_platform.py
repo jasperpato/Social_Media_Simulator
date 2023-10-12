@@ -1,26 +1,63 @@
+from media_platform import MediaPlatform
 from agent import Agent
-import matplotlib.pyplot as plt
-from globals import *
-import random
 
-class MediaPlatform():
-	
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+from globals import *
+import sys
+
+
+class BiasedMediaPlatform():
 	def __init__(self, bias=0, verbose=False):
 		self.verbose = verbose
-		self.agents = [Agent(bias=bias, is_poster=i < NUM_POSTERS) for i in range(NUM_AGENTS)]
+		self.agents = [Agent(bias, i < NUM_POSTERS) for i in range(NUM_AGENTS)]
 		self.prev_opinions = [a.opinion for a in self.agents]
 		self.num_same = 0
+		[self.platform_opinion] = random.sample([-1, 1], 1)
+		
+		
+	def serve_posts(self):
+		ctc = np.zeros((NUM_POSTERS, NUM_AGENTS))  # creator to consumer matrix
+		ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
+             
+		# calculate similarity between creator and consumer opinions
+		ctc_consumer_sim = 2 - np.abs(ctc - self.prev_opinions) + sys.float_info.epsilon
+		# calculate similarity between creator and platform opinions
+		ctc_platform_sim = 2 - np.abs(ctc - self.platform_opinion) + sys.float_info.epsilon
+            
+		ctc = PLATFORM_BIAS * ctc_platform_sim + RECOMMENDATION_BIAS * ctc_consumer_sim
+		ctc = ctc / np.max(ctc, axis=0, keepdims=True)               # normalize with max of each agent's posts
+		ctc[np.diag_indices(NUM_POSTERS)] = 0                        # posters should not consume their own posts
+		return ctc
+
 
 	def time_step(self):
 		'''
-		Each agent consumes the same subset of posts
+		Each agent consumes its own served posts
 		'''
-		self.posts = random.sample([a.opinion for a in self.agents if a.is_poster], POSTS_PER_DAY)
-		for a in self.agents:
-			for p in self.posts:
-				a.consume_post(p)
-			a.opinions.append(a.opinion)
+		self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]], dtype=float)
+		self.posts += np.random.normal(scale=POST_NOISE, size=self.posts.shape) 	# add noise to posts
+		self.posts = np.clip(self.posts, -1, 1) 									# clip posts to [-1, 1]
 
+		if PLATFORM_BIAS or RECOMMENDATION_BIAS:
+			ctc = self.serve_posts()
+			for i in range(NUM_AGENTS):
+				post_scores = ctc[:, i]
+				selected_posts = self.posts[np.argsort(post_scores)][::-1][:POSTS_PER_DAY]
+				
+				for p in selected_posts:
+					self.agents[i].consume_post(p)
+				
+				self.agents[i].opinions.append(self.agents[i].opinion)
+		else:
+			selected_posts = np.random.choice(self.posts, POSTS_PER_DAY)
+			for a in self.agents:
+				for p in selected_posts:
+					a.consume_post(p)
+				a.opinions.append(a.opinion)
+
+	
 	def converged(self):
 		'''
 		Return True if no opinions have changed in the last CONVERGENCE_NUM time steps
@@ -34,6 +71,7 @@ class MediaPlatform():
 
 		return self.num_same == CONVERGENCE_NUM
 
+
 	def simulate(self):
 		'''
 		Execute the specified time steps, or until convergence of opinions
@@ -44,6 +82,7 @@ class MediaPlatform():
 			self.time_step()
 			if self.converged():
 				return
+
 
 	def fractions(self):
 		'''
@@ -58,11 +97,13 @@ class MediaPlatform():
 
 		return [pos, neg]
 	
+
 	def polarisation(self):
 		'''
 		Return polarisation value between [0, 1]
 		'''
 		return min(self.fractions())
+
 
 	def graph(self):
 		'''
@@ -71,10 +112,14 @@ class MediaPlatform():
 		_, ax = plt.subplots()
 		for i, a in enumerate(self.agents):
 			ax.plot(a.opinions, label=str(i))
+		
 
 if __name__ == '__main__':
-	m = MediaPlatform(bias=0.7)
-	m.simulate()
-	print(m.fractions())
-	m.graph()
-	plt.show(block=True)
+	if __name__ == '__main__':
+		np.random.seed(40)
+		m = BiasedMediaPlatform(bias=0.3)
+		m.simulate()
+		print(m.fractions())
+		print(m.platform_opinion)
+		m.graph()
+		plt.show(block=True)
