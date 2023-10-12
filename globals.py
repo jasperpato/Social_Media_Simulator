@@ -19,7 +19,7 @@ RECOMMENDATION_BIAS = 1
 
 # ---------- simulations ----------
 
-STEP = 0.1
+STEP = 0.01
 BS = [round(STEP * i, 3) for i in range(0, int(1 / STEP) + 1)]
 
 NUM_SIMULATIONS = 500
