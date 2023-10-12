@@ -1,5 +1,6 @@
 from agent import Agent
 
+import time
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -13,7 +14,7 @@ class MediaPlatform():
 		self.agents = [Agent(bias, i < NUM_POSTERS) for i in range(NUM_AGENTS)]
 		self.prev_opinions = [a.opinion for a in self.agents]
 		self.num_same = 0
-		[self.platform_opinion] = random.sample([-1, 1], 1)
+		[self.platform_opinion] = np.random.choice([-1, 1], 1)
 		
 		
 	def serve_posts(self):
@@ -115,10 +116,12 @@ class MediaPlatform():
 
 if __name__ == '__main__':
 	if __name__ == '__main__':
-		np.random.seed(40)
-		m = MediaPlatform(bias=0.3)
+		start_time = time.time()
+		np.random.seed(10)
+		m = MediaPlatform(bias=0.7)
 		m.simulate()
 		print(m.fractions())
 		print(m.platform_opinion)
+		print("--- %s seconds ---" % (time.time() - start_time))
 		m.graph()
 		plt.show(block=True)
