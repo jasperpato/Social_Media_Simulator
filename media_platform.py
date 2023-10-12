@@ -72,7 +72,9 @@ class MediaPlatform():
 				self.change_agent_opinions(selected_posts)
 		else:
 			selected_posts = np.random.choice(self.posts, POSTS_PER_DAY)
-			self.change_agent_opinions(selected_posts)
+			for i in range(POSTS_PER_DAY):
+				posts_i = np.tile(selected_posts[i], NUM_AGENTS)
+				self.change_agent_opinions(posts_i)
 		
 		self.t_agent_opinion = np.vstack((self.t_agent_opinion, self.agent_opinions))
 
@@ -136,7 +138,7 @@ if __name__ == '__main__':
 	if __name__ == '__main__':
 		start_time = time.time()
 		np.random.seed(10)
-		m = MediaPlatform(bias=0.3)
+		m = MediaPlatform(bias=0.7)
 		m.simulate()
 		print(m.fractions())
 		print(m.platform_opinion)

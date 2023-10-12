@@ -17,7 +17,7 @@ C = 0.1
 D = 0.1
 
 # biased platform parameters
-PLATFORM_BIAS = 1
+PLATFORM_BIAS = 0
 RECOMMENDATION_BIAS = 0
 
 # ---------- simulations ----------
