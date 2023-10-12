@@ -1,4 +1,4 @@
-from media_platform import MediaPlatform
+from quick_media_platform import MediaPlatform
 import matplotlib.pyplot as plt
 import json
 from globals import *
