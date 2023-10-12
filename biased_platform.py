@@ -11,19 +11,13 @@ import sys
 class BiasedMediaPlatform():
 	def __init__(self, bias=0, verbose=False):
 		self.verbose = verbose
-		self.agents = [Agent(bias=bias, is_poster=i < NUM_POSTERS) for i in range(NUM_AGENTS)]
+		self.agents = [Agent(bias, i < NUM_POSTERS) for i in range(NUM_AGENTS)]
 		self.prev_opinions = [a.opinion for a in self.agents]
 		self.num_same = 0
 		[self.platform_opinion] = random.sample([-1, 1], 1)
 		
 		
 	def serve_posts(self):
-		self.posts += np.random.normal(scale=POST_NOISE, size=self.posts.shape) 	# add noise to posts
-
-		# clip posts to [-1, 1]
-		self.posts = np.min([np.ones(self.posts.shape), self.posts], axis=0)	
-		self.posts = np.min([-np.ones(self.posts.shape), self.posts], axis=0)
-
 		ctc = np.zeros((NUM_POSTERS, NUM_AGENTS))  # creator to consumer matrix
 		ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
              
@@ -43,6 +37,8 @@ class BiasedMediaPlatform():
 		Each agent consumes its own served posts
 		'''
 		self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]], dtype=float)
+		self.posts += np.random.normal(scale=POST_NOISE, size=self.posts.shape) 	# add noise to posts
+		self.posts = np.clip(self.posts, -1, 1) 									# clip posts to [-1, 1]
 
 		if PLATFORM_BIAS or RECOMMENDATION_BIAS:
 			ctc = self.serve_posts()
@@ -124,5 +120,6 @@ if __name__ == '__main__':
 		m = BiasedMediaPlatform(bias=0.3)
 		m.simulate()
 		print(m.fractions())
+		print(m.platform_opinion)
 		m.graph()
 		plt.show(block=True)
