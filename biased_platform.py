@@ -18,7 +18,6 @@ class BiasedMediaPlatform(MediaPlatform):
 		
 		
       def serve_posts(self):
-            self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]])
             ctc = np.zeros((NUM_POSTERS, NUM_AGENTS))  # creator to consumer matrix
             ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
                   
@@ -37,19 +36,12 @@ class BiasedMediaPlatform(MediaPlatform):
             '''
                   Each agent consumes its own served posts
             '''
-            ctc = self.serve_posts().T                                              # transpose to get consumer to creator matrix
-            posts_received = (np.random.rand(NUM_AGENTS, NUM_POSTERS) < ctc)        # return boolean matrix of posts served to each agent
+            self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]])
+            ctc = self.serve_posts()
+            
             for i in range(NUM_AGENTS):
-                  posts_i = self.posts[posts_received[i]]
-                  post_scores = ctc[i][posts_received[i]]
-
                   # sort posts by score and take the top POSTS_PER_DAY
-                  selected_posts = posts_i[np.argsort(post_scores)][::-1][:POSTS_PER_DAY]
-                  unselected_posts = self.posts[~posts_received[i]]
-                  
-                  if len(selected_posts) < POSTS_PER_DAY:
-                        sampled_posts = np.random.choice(unselected_posts, size = POSTS_PER_DAY - len(selected_posts), replace = False)
-                        selected_posts = np.concatenate((selected_posts, sampled_posts))
+                  selected_posts = self.posts[np.argsort(ctc[:, i])][::-1][:POSTS_PER_DAY]
 
                   for p in selected_posts:
                         self.agents[i].consume_post(p)
@@ -57,30 +49,13 @@ class BiasedMediaPlatform(MediaPlatform):
                   self.agents[i].opinions.append(self.agents[i].opinion)
 			
 	
-def simulate():
-	'''
-	Execute an entire simulation
-	'''
-	m = BiasedMediaPlatform()
-	m.simulate()
-	m.graph()
-	return (m.fractions(), m.platform_opinion)
-
-SIMULATIONS = 1
-
 if __name__ == '__main__':
-      fractions = []
-      platform_opinions = []
-      try:
-            for i in range(SIMULATIONS):
-                  f, opinion = simulate()
-                  fractions.append(f)
-                  platform_opinions.append(opinion)
-
-      except KeyboardInterrupt:
-            pass
-
-      print(fractions)
-      print(platform_opinions)
-      plt.show(block=True)
+	if __name__ == '__main__':
+		np.random.seed(40)
+		m = BiasedMediaPlatform()
+		m.simulate()
+		print(m.fractions())
+		print(m.platform_opinion)
+		m.graph()
+		plt.show(block=True)
 
