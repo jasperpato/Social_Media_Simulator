@@ -69,7 +69,7 @@ class MediaPlatform():
 		Graph every agent's opinion changing over time
 		'''
 		_, ax = plt.subplots()
-		for i, a in enumerate(self.agents[NUM_POSTERS:]):
+		for i, a in enumerate(self.agents):
 			ax.plot(a.opinions, label=str(i))
 
 if __name__ == '__main__':

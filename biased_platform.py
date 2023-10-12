@@ -14,7 +14,13 @@ class BiasedMediaPlatform(MediaPlatform):
 		
 		
 	def serve_posts(self):
-		self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]])
+		self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]], dtype=float)
+		self.posts += np.random.normal(scale=POST_NOISE, size=self.posts.shape) 	# add noise to posts
+
+		# clip posts to [-1, 1]
+		self.posts = np.min([np.ones(self.posts.shape), self.posts], axis=0)	
+		self.posts = np.min([-np.ones(self.posts.shape), self.posts], axis=0)
+
 		ctc = np.zeros((NUM_POSTERS, NUM_AGENTS))  # creator to consumer matrix
 		ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
              
@@ -25,7 +31,6 @@ class BiasedMediaPlatform(MediaPlatform):
             
 		ctc = PLATFORM_BIAS * ctc_platform_sim + RECOMMENDATION_BIAS * ctc_consumer_sim
 		ctc = ctc / np.max(ctc, axis=0, keepdims=True)               # normalize with max of each agent's posts
-		ctc += np.random.normal(scale=0.2, size=ctc.shape)
 		ctc[np.diag_indices(NUM_POSTERS)] = 0                        # posters should not consume their own posts
 		
 		ctc = ctc.T  # transpose to get consumer to creator matrix
@@ -47,28 +52,12 @@ class BiasedMediaPlatform(MediaPlatform):
 			
 			self.agents[i].opinions.append(self.agents[i].opinion)
 		
-	
-def simulate():
-	'''
-	Execute an entire simulation
-	'''
-	m = BiasedMediaPlatform(bias=0)
-	m.simulate()
-	m.graph()
-	return (m.fractions(), m.platform_opinion)
 
 if __name__ == '__main__':
-	fractions = []
-	platform_opinions = []
-	try:
-		for i in range(NUM_SIMULATIONS):
-			f, opinion = simulate()
-			fractions.append(f)
-			platform_opinions.append(opinion)
-
-	except KeyboardInterrupt:
-		pass
-
-	print(fractions)
-	print(platform_opinions)
-	plt.show(block=True)
+	if __name__ == '__main__':
+		random.seed(0)
+		m = BiasedMediaPlatform(bias=0.3)
+		m.simulate()
+		print(m.fractions())
+		m.graph()
+		plt.show(block=True)
