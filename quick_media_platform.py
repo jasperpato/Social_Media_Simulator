@@ -105,7 +105,7 @@ class MediaPlatform():
 
 	def fractions(self):
 		'''
-		Return the fractions of agents holding the extreme opinions [-1, 1]
+		Return the fractions of agents holding positive and negative opinions
 		'''
 		pos = np.sum(self.agent_opinions > 0) / NUM_AGENTS
 		neg = np.sum(self.agent_opinions < 0) / NUM_AGENTS
@@ -140,6 +140,6 @@ if __name__ == '__main__':
 	m.simulate()
 	print(m.fractions())
 	print(m.platform_opinion)
-	print("--- %s seconds ---" % (time.time() - start_time))
+	print(f'--- {round(time.time() - start_time, 4)} seconds ---')
 	m.graph()
 	plt.show(block=True)
