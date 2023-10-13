@@ -107,8 +107,8 @@ class MediaPlatform():
 		'''
 		Return the fractions of agents holding positive and negative opinions
 		'''
-		pos = np.sum(self.agent_opinions > 0) / NUM_AGENTS
-		neg = np.sum(self.agent_opinions < 0) / NUM_AGENTS
+		pos = np.sum(self.agent_opinions > POLARISATION_CUTOFF) / NUM_AGENTS
+		neg = np.sum(self.agent_opinions < -POLARISATION_CUTOFF) / NUM_AGENTS
 
 		if self.verbose:
 			print(f'Fraction positive {pos}')
