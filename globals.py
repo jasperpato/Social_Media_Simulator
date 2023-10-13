@@ -5,7 +5,7 @@ NUM_TIME_STEPS = 500
 CONVERGENCE_NUM = 10
 
 # proportion of posting agents
-P = 0.25
+P = 0.75
 
 # standard deviation of Gaussian noise applied to posts
 POST_NOISE = 0 # 0.05
