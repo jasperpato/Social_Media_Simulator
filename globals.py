@@ -1,5 +1,5 @@
 NUM_AGENTS = 500
-NUM_TIME_STEPS = 1000
+NUM_TIME_STEPS = 500
 
 # number of time steps with no change to end the simulation
 CONVERGENCE_NUM = 10
@@ -8,10 +8,10 @@ CONVERGENCE_NUM = 10
 P = 0.25
 
 # standard deviation of Gaussian noise applied to posts
-POST_NOISE = 0.05
+POST_NOISE = 0 # 0.05
 
 # proportion of posts consumed per day
-C = 0.5
+C = 0.1
 
 # change in agent's opinion due to a post
 D = 0.1
