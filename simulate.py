@@ -1,7 +1,9 @@
-from media_platform import MediaPlatform
+from quick_media_platform import MediaPlatform
 import matplotlib.pyplot as plt
 import json
 from globals import *
+
+DATA_NAME = f'p{P}-c{C}-plat{PLATFORM_BIAS}-rec{RECOMMENDATION_BIAS}'
 
 def save(fractions, filename):
 	data = {
@@ -25,7 +27,6 @@ def simulate(b):
 	'''
 	m = MediaPlatform(bias=b)
 	m.simulate()
-	# m.graph()
 	return m.polarisation()
 
 def variance(lst):
@@ -48,7 +49,7 @@ if __name__ == '__main__':
 		# pass
 
 	print(fractions)
-	save(fractions, filename='data/data2.json')
+	save(fractions, filename=f'data/data-{DATA_NAME}.json')
 
 	x, y = zip(*[(k, round(sum(v) / NUM_SIMULATIONS, 4)) for k, v in fractions.items()])
 
@@ -56,7 +57,7 @@ if __name__ == '__main__':
 	ax.plot(x, y)
 	plt.xlabel('Bias')
 	plt.ylabel('Mean Polarisation')
-	plt.savefig('data/bias-avg2.png')
+	plt.savefig(f'data/bias-avg-{DATA_NAME}.png')
 
 	x, y = zip(*[(k, round(variance(v), 4)) for k, v in fractions.items()])
 
@@ -64,7 +65,7 @@ if __name__ == '__main__':
 	ax.plot(x, y)
 	plt.xlabel('Bias')
 	plt.ylabel('Polarisation Variance')
-	plt.savefig('data/bias-var2.png')
+	plt.savefig(f'data/bias-var-{DATA_NAME}.png')
 
 	# plt.show(block=True)
 	# plt.show(block=True)

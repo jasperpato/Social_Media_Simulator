@@ -6,14 +6,14 @@ import time
 
 
 class MediaPlatform():
-	def __init__(self, bias=0.7, verbose=False):
+	def __init__(self, agent_bias, verbose=False):
 		self.verbose = verbose
 		self.num_same = 0
 		[self.platform_opinion] = np.random.choice([-1, 1], 1)
 
-		self.bias = bias
-		if self.bias > 0:
-			self.m = (2 - bias) / (2 * bias)
+		self.agent_bias = agent_bias
+		if self.agent_bias > 0:
+			self.m = (2 - agent_bias) / (2 * agent_bias)
 			self.c = 1 - 2 * self.m
 
 		self.agent_opinions = np.random.uniform(-1, 1, NUM_AGENTS)
@@ -25,8 +25,8 @@ class MediaPlatform():
 		diff = np.abs(posts - self.agent_opinions)
 		strengthen_probs = np.zeros(NUM_AGENTS)
 		
-		fun1 = diff <= 2 - self.bias
-		fun2 = diff > 2 - self.bias
+		fun1 = diff <= 2 - self.agent_bias
+		fun2 = diff > 2 - self.agent_bias
 
 		strengthen_probs[fun1] = 1 - diff[fun1] / 2
 		strengthen_probs[fun2] = self.m * diff[fun2] + self.c
@@ -136,7 +136,7 @@ class MediaPlatform():
 if __name__ == '__main__':
 	start_time = time.time()
 	np.random.seed(10)
-	m = MediaPlatform(bias=0.7)
+	m = MediaPlatform(agent_bias=0.7)
 	m.simulate()
 	print(m.fractions())
 	print(m.platform_opinion)
