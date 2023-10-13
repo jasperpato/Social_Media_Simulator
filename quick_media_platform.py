@@ -12,6 +12,9 @@ class MediaPlatform():
 		[self.platform_opinion] = np.random.choice([-1, 1], 1)
 
 		self.agent_bias = agent_bias
+		self.m = 0
+		self.c = 0
+		
 		if self.agent_bias > 0:
 			self.m = (2 - agent_bias) / (2 * agent_bias)
 			self.c = 1 - 2 * self.m

@@ -25,7 +25,7 @@ def simulate(b):
 	'''
 	Execute an entire simulation
 	'''
-	m = MediaPlatform(bias=b)
+	m = MediaPlatform(agent_bias=b)
 	m.simulate()
 	return m.polarisation()
 
