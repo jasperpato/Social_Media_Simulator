@@ -1,20 +1,40 @@
-from agent import Agent
-
-import time
 import matplotlib.pyplot as plt
 import numpy as np
-import random
 from globals import *
 import sys
+import time
 
 
 class MediaPlatform():
 	def __init__(self, bias=0.7, verbose=False):
 		self.verbose = verbose
-		self.agents = [Agent(bias, i < NUM_POSTERS) for i in range(NUM_AGENTS)]
-		self.prev_opinions = [a.opinion for a in self.agents]
 		self.num_same = 0
 		[self.platform_opinion] = np.random.choice([-1, 1], 1)
+
+		self.bias = bias
+		if self.bias > 0:
+			self.m = (2 - bias) / (2 * bias)
+			self.c = 1 - 2 * self.m
+
+		self.agent_opinions = np.random.uniform(-1, 1, NUM_AGENTS)
+		self.t_agent_opinion = self.agent_opinions.copy()
+		self.prev_opinions = self.agent_opinions.copy()
+
+	
+	def change_agent_opinions(self, posts):
+		diff = np.abs(posts - self.agent_opinions)
+		strengthen_probs = np.zeros(NUM_AGENTS)
+		
+		fun1 = diff <= 2 - self.bias
+		fun2 = diff > 2 - self.bias
+
+		strengthen_probs[fun1] = 1 - diff[fun1] / 2
+		strengthen_probs[fun2] = self.m * diff[fun2] + self.c
+
+		strengthened = np.random.random(NUM_AGENTS) < strengthen_probs
+		self.agent_opinions[strengthened] += np.sign(self.agent_opinions[strengthened]) * D			# strengthen opinions
+		self.agent_opinions[~strengthened] -= np.sign(self.agent_opinions[~strengthened]) * D		# weaken opinions
+		self.agent_opinions = np.clip(self.agent_opinions, -1, 1)
 		
 		
 	def serve_posts(self):
@@ -22,7 +42,7 @@ class MediaPlatform():
 		ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
              
 		# calculate similarity between creator and consumer opinions
-		ctc_consumer_sim = 2 - np.abs(ctc - self.prev_opinions) + sys.float_info.epsilon
+		ctc_consumer_sim = 2 - np.abs(ctc - self.agent_opinions) + sys.float_info.epsilon
 		# calculate similarity between creator and platform opinions
 		ctc_platform_sim = 2 - np.abs(ctc - self.platform_opinion) + sys.float_info.epsilon
             
@@ -36,37 +56,36 @@ class MediaPlatform():
 		'''
 		Each agent consumes its own served posts
 		'''
-		self.posts = np.array([a.opinion for a in self.agents[:NUM_POSTERS]], dtype=float)
+		self.posts = self.agent_opinions[:NUM_POSTERS] 								# posts are the opinions of the posting agents
 		self.posts += np.random.normal(scale=POST_NOISE, size=self.posts.shape) 	# add noise to posts
 		self.posts = np.clip(self.posts, -1, 1) 									# clip posts to [-1, 1]
 
 		if PLATFORM_BIAS or RECOMMENDATION_BIAS:
 			ctc = self.serve_posts()
-			for i in range(NUM_AGENTS):
-				post_scores = ctc[:, i]
-				selected_posts = self.posts[np.argsort(post_scores)][::-1][:POSTS_PER_DAY]
-				
-				for p in selected_posts:
-					self.agents[i].consume_post(p)
-				
-				self.agents[i].opinions.append(self.agents[i].opinion)
+			tiled_posts = np.tile(self.posts, (NUM_AGENTS, 1))
+			sort_order = np.argsort(ctc.T, axis=1)[:, ::-1]
+			tiled_posts = np.take_along_axis(tiled_posts, sort_order, axis=1)
+
+			for i in range(POSTS_PER_DAY):
+				selected_posts = tiled_posts[:, i]
+				self.change_agent_opinions(selected_posts)
 		else:
 			selected_posts = np.random.choice(self.posts, POSTS_PER_DAY)
-			for a in self.agents:
-				for p in selected_posts:
-					a.consume_post(p)
-				a.opinions.append(a.opinion)
+			for i in range(POSTS_PER_DAY):
+				posts_i = np.tile(selected_posts[i], NUM_AGENTS)
+				self.change_agent_opinions(posts_i)
+		
+		self.t_agent_opinion = np.vstack((self.t_agent_opinion, self.agent_opinions))
 
 	
 	def converged(self):
 		'''
 		Return True if no opinions have changed in the last CONVERGENCE_NUM time steps
 		'''
-		opinions = [a.opinion for a in self.agents]
-		if opinions[NUM_POSTERS:] == self.prev_opinions[NUM_POSTERS:]:
+		if np.all(self.agent_opinions == self.prev_opinions):
 			self.num_same += 1
 		else:
-			self.prev_opinions = opinions
+			self.prev_opinions = self.agent_opinions.copy()
 			self.num_same = 0
 
 		return self.num_same == CONVERGENCE_NUM
@@ -88,8 +107,8 @@ class MediaPlatform():
 		'''
 		Return the fractions of agents holding the extreme opinions [-1, 1]
 		'''
-		pos = len([a for a in self.agents if a.opinion >= 0]) / NUM_AGENTS
-		neg = len([a for a in self.agents if a.opinion < 0]) / NUM_AGENTS
+		pos = np.sum(self.agent_opinions > 0) / NUM_AGENTS
+		neg = np.sum(self.agent_opinions < 0) / NUM_AGENTS
 
 		if self.verbose:
 			print(f'Fraction positive {pos}')
@@ -110,8 +129,8 @@ class MediaPlatform():
 		Graph every agent's opinion changing over time
 		'''
 		_, ax = plt.subplots()
-		for i, a in enumerate(self.agents):
-			ax.plot(a.opinions, label=str(i))
+		for i in range(NUM_AGENTS):
+			ax.plot(self.t_agent_opinion[:, i], label=i)
 		
 
 if __name__ == '__main__':
