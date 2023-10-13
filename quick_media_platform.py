@@ -134,13 +134,12 @@ class MediaPlatform():
 		
 
 if __name__ == '__main__':
-	if __name__ == '__main__':
-		start_time = time.time()
-		np.random.seed(10)
-		m = MediaPlatform(bias=0.7)
-		m.simulate()
-		print(m.fractions())
-		print(m.platform_opinion)
-		print("--- %s seconds ---" % (time.time() - start_time))
-		m.graph()
-		plt.show(block=True)
+	start_time = time.time()
+	np.random.seed(10)
+	m = MediaPlatform(bias=0.7)
+	m.simulate()
+	print(m.fractions())
+	print(m.platform_opinion)
+	print("--- %s seconds ---" % (time.time() - start_time))
+	m.graph()
+	plt.show(block=True)
