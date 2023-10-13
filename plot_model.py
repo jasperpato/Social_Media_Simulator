@@ -1,35 +1,30 @@
 import matplotlib.pyplot as plt
 
-def plot_model(b):
+def plot_model(b, ax):
 	x = 2-b
 	y = 1 - x/2
 
-	plt.plot((0, x), (1, y), color='blue')
-	plt.plot((x, 2), (y, 0), linestyle='dashed', color='blue')
+	ax.plot((0, x), (1, y), color='blue')
+	ax.plot((x, 2), (y, 0), linestyle='dashed', color='blue')
 
 	if b:
-		plt.plot((x, 2), (y, 1), color='red')
+		ax.plot((x, 2), (y, 1), color='red')
 
-		plt.plot((x, 2), (0, 0), color='green')
-		plt.plot((x, x), (-0.05, 0.05), color='green')
-		plt.plot((2, 2), (-0.05, 0.05), color='green')
-		plt.text((2+x)/2, -0.05, 'B', color='green')
+		ax.plot((x, 2), (0, 0), color='green')
+		ax.plot((x, x), (-0.05, 0.05), color='green')
+		ax.plot((2, 2), (-0.05, 0.05), color='green')
+		ax.text((2+x)/2, -0.075, 'B', color='green', fontsize=10)
 
-	plt.xlabel('Difference in opinion, |o1 - o2|')
-	plt.ylabel('Probability of strengthening opinion, P(S)')
-	plt.title(f'Confirmation Bias Model (B = {b})')
+	ax.set_title(f'Confirmation Bias Model (B = {b})', fontsize=12)
 
-plot_model(0)
-plt.savefig('data/model/bias-model-0.png')
+fig, axs = plt.subplots(2, 2, figsize=(14, 8), sharex=True, sharey=True)
 
-plt.figure()
+plot_model(0, axs[0, 0])
+plot_model(1, axs[0, 1])
+plot_model(0.75, axs[1, 0])
+plot_model(0.25, axs[1, 1])
 
-plot_model(0.5)
-plt.savefig('data/model/bias-model-0.5.png')
+fig.text(0.5, 0.04, 'Difference in opinion, |o1 - o2|', ha='center', fontsize=12)
+fig.text(0.08, 0.5, 'Probability of strengthening opinion, P(S)', va='center', rotation='vertical', fontsize=12)
 
-plt.figure()
-
-plot_model(1)
-plt.savefig('data/model/bias-model-1.png')
-
-plt.show(block=True)
+plt.savefig('data/bias-model.png', dpi=600, bbox_inches='tight')
