@@ -7,11 +7,12 @@ import time
 
 
 class MediaPlatform():
-	def __init__(self, b=B, p=P, n=N, c=C, pb=PB, rb=RB, poster_dist='uniform', verbose=False):
+	def __init__(self, b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform', verbose=False):
 		self.b = b				# agent bias
 		self.p = p				# proportion of posting agents
 		self.n = n				# standard deviation of Gaussian noise applied to posts
 		self.c = c				# proportion of generated posts consumed per day
+		self.d = d				# amount opinions are strengthed/weakened by
 		self.pb = pb			# platform bias
 		self.rb = rb			# recommendation bias
 		self.verbose = verbose
@@ -41,12 +42,15 @@ class MediaPlatform():
 			elif poster_dist == 'skewed':		# skew away from platform opinion
 				skew_direction = math.copysign(1, self.platform_opinion)
 				probs = np.cos((opinions + skew_direction) / 4 * np.pi) ** 2
+			else:
+				raise ValueError('Invalid poster distribution')
 			probs /= np.sum(probs)
 			self.agent_opinions[:self.num_posters] = np.random.choice(opinions, self.num_posters, p=probs)
 			
 		self.agent_opinions[self.num_posters:] = np.random.uniform(-1, 1, NUM_AGENTS - self.num_posters)
 		self.t_agent_opinion = self.agent_opinions.copy()
 		self.prev_opinions = self.agent_opinions.copy()
+		self.t = 0
 
 
 	def change_agent_opinions(self, posts):
@@ -60,8 +64,8 @@ class MediaPlatform():
 		strengthen_probs[fun2] = self.m * diff[fun2] + self.c
 
 		strengthened = np.random.random(NUM_AGENTS) < strengthen_probs
-		self.agent_opinions[strengthened] += np.sign(self.agent_opinions[strengthened]) * D			# strengthen opinions
-		self.agent_opinions[~strengthened] -= np.sign(self.agent_opinions[~strengthened]) * D		# weaken opinions
+		self.agent_opinions[strengthened] += np.sign(self.agent_opinions[strengthened]) * self.d			# strengthen opinions
+		self.agent_opinions[~strengthened] -= np.sign(self.agent_opinions[~strengthened]) * self.d			# weaken opinions
 		self.agent_opinions = np.clip(self.agent_opinions, -1, 1)
 		
 		
@@ -104,6 +108,7 @@ class MediaPlatform():
 				self.change_agent_opinions(posts_i)
 		
 		self.t_agent_opinion = np.vstack((self.t_agent_opinion, self.agent_opinions))
+		self.t += 1
 
 	
 	def converged(self):
@@ -163,11 +168,11 @@ class MediaPlatform():
 
 if __name__ == '__main__':
 	start_time = time.time()
-	np.random.seed(0)
-	m = MediaPlatform(b=0.3)
+	m = MediaPlatform(b=0.6, poster_dist='centered')
 	m.simulate()
 	print(m.fractions())
 	print(m.platform_opinion)
+	print(m.t)
 	print(f'--- {round(time.time() - start_time, 4)} seconds ---')
 	m.graph()
 	plt.show(block=True)
