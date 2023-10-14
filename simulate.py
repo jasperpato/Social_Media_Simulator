@@ -4,7 +4,7 @@ import json
 from globals import *
 
 
-DATA_NAME = f'b{B}-p{P}-c{C}-rec{RECOMMENDATION_BIAS}'
+DATA_NAME = f'b{B}-p{P}-c{C}-platform{PLATFORM_BIAS}'
 
 
 def save(fractions, filename):
@@ -28,11 +28,11 @@ def save(fractions, filename):
 		json.dump(data, f, indent=2)
 
 
-def simulate(platform_bias):
+def simulate(rec):
 	'''
 	Execute an entire simulation
 	'''
-	m = MediaPlatform(platform_bias=platform_bias)
+	m = MediaPlatform(rec_bias=rec)
 	m.simulate()
 	return [int(m.platform_opinion), *[float(f) for f in m.fractions()]]
 
@@ -71,12 +71,12 @@ if __name__ == '__main__':
 
 	data = {}
 	try:
-		for plat in PLATFORMS:
-			print(plat)
-			data[plat] = []
+		for rec in RECOMMENDATIONS:
+			print(rec)
+			data[rec] = []
 			for i in range(NUM_SIMULATIONS):
-				results = simulate(plat)
-				data[plat].append(results)
+				results = simulate(rec)
+				data[rec].append(results)
 			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
 
 	except KeyboardInterrupt:
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
 	print(data)
 
-	save(data, filename=f'data/platform-vs-polarisation/data-{DATA_NAME}.json')
+	save(data, filename=f'data/rec-vs-polarisation/data-{DATA_NAME}.json')
 
 	# backup
 	save(data, filename=pathlib.Path.home() / f'data-{DATA_NAME}.json')

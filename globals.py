@@ -18,12 +18,14 @@ C = 0.1
 D = 0.1
 
 # agent bias
-B = 0
+B = 0.5
 
 # biased platform parameters
-PLATFORM_BIAS = 0
-PLATFORMS = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
+PLATFORM_BIAS = 1
 
-RECOMMENDATION_BIAS = 1
+# PLATFORMS = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
+
+RECOMMENDATION_BIAS = 0
+RECOMMENDATIONS = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
 
 POLARISATION_CUTOFF = 0.75
