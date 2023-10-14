@@ -1,9 +1,11 @@
-from quick_media_platform import MediaPlatform
+from media_platform import MediaPlatform
 import matplotlib.pyplot as plt
 import json
 from globals import *
 
-DATA_NAME = f'p{P}-c{C}-plat{PLATFORM_BIAS}-rec{RECOMMENDATION_BIAS}'
+
+DATA_NAME = f'b{B}-p{P}-c{C}-rec{RECOMMENDATION_BIAS}'
+
 
 def save(fractions, filename):
 	data = {
@@ -12,45 +14,38 @@ def save(fractions, filename):
 			'NUM_TIME_STEPS': NUM_TIME_STEPS,
 			'CONVERGENCE_NUM': CONVERGENCE_NUM,
 			'NUM_SIMULATIONS': NUM_SIMULATIONS,
+			'B': B,
 			'P': P,
 			'C': C,
-			'D': D
+			'D': D,
+			'POST_NOISE': POST_NOISE,
+			'PLATFORM_BIAS': PLATFORM_BIAS,
+			'RECOMMENDATION_BIAS': RECOMMENDATION_BIAS
 		},
 		'data': fractions
 	}
 	with open(filename, 'w') as f:
 		json.dump(data, f, indent=2)
 
-def simulate(b):
+
+def simulate(platform_bias):
 	'''
 	Execute an entire simulation
 	'''
-	m = MediaPlatform(agent_bias=b)
+	m = MediaPlatform(platform_bias=platform_bias)
 	m.simulate()
-	return m.polarisation()
+	return [int(m.platform_opinion), *[float(f) for f in m.fractions()]]
+
 
 def variance(lst):
 	avg = sum(lst) / len(lst)
 	return sum([(x - avg)**2 for x in lst]) / len(lst)
 
-if __name__ == '__main__':
-	fractions = {}
-	try:
-		for b in BS:
-			print(b)
-			fractions[b] = []
-			for i in range(NUM_SIMULATIONS):
-				f = simulate(b)
-				fractions[b].append(f)
-			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
 
-	except KeyboardInterrupt:
-		exit()
-		# pass
-
-	print(fractions)
-	save(fractions, filename=f'data/data-{DATA_NAME}.json')
-
+def plot(fractions):
+	'''
+	Plot bias vs polarisation
+	'''
 	x, y = zip(*[(k, round(sum(v) / NUM_SIMULATIONS, 4)) for k, v in fractions.items()])
 
 	fig, ax = plt.subplots()
@@ -69,3 +64,24 @@ if __name__ == '__main__':
 
 	# plt.show(block=True)
 	# plt.show(block=True)
+
+
+if __name__ == '__main__':
+	data = {}
+	try:
+		for plat in PLATFORMS:
+			print(plat)
+			data[plat] = []
+			for i in range(NUM_SIMULATIONS):
+				results = simulate(plat)
+				data[plat].append(results)
+			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
+
+	except KeyboardInterrupt:
+		exit()
+		# pass
+
+	print(data)
+	save(data, filename=f'data/platform-vs-polarisation/data-{DATA_NAME}.json')
+
+	# plot(fractions)
