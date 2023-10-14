@@ -67,6 +67,8 @@ def plot(fractions):
 
 
 if __name__ == '__main__':
+	import pathlib
+
 	data = {}
 	try:
 		for plat in PLATFORMS:
@@ -82,6 +84,10 @@ if __name__ == '__main__':
 		# pass
 
 	print(data)
+
 	save(data, filename=f'data/platform-vs-polarisation/data-{DATA_NAME}.json')
+
+	# backup
+	save(data, filename=pathlib.Path.home() / f'data-{DATA_NAME}.json')
 
 	# plot(fractions)
