@@ -1,6 +1,7 @@
 from media_platform import MediaPlatform
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 import json
 import os
@@ -31,11 +32,11 @@ def save(fractions, filename):
 		json.dump(data, f, indent=2)
 
 
-def simulate(platform_bias):
+def simulate(b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform'):
 	'''
 	Execute an entire simulation
 	'''
-	m = MediaPlatform(platform_bias=platform_bias)
+	m = MediaPlatform(b, p, n, c, d, pb, rb, poster_dist)
 	m.simulate()
 	return m
 
@@ -92,29 +93,55 @@ def simulate_platform_bias():
 	save(data, filename=pathlib.Path.home() / f'data-{DATA_NAME}.json')
 
 
-def simulate_platform_vs_agent_bias(num_steps):
+def simulate_plat_vs_agent_bias(poster_dist, num_steps=100):
 	data = np.zeros((num_steps, num_steps))
 	agent_biases = np.linspace(0, 1, num_steps)
 	platform_biases = np.linspace(0, 2, num_steps)
 	try:
 		for i, b in enumerate(tqdm(agent_biases)):
-			for j, p in enumerate(platform_biases):
-				m = simulate(agent_bias=b, platform_bias=p, post_noise=0)
-				data[i, j] = m.fractions()[m.platform_opinion]
+			for j, pb in enumerate(platform_biases):
+				d = 0
+				for _ in range(10):
+					m = simulate(b=b, pb=pb, rb=1, poster_dist=poster_dist)
+					d += m.fractions()[m.platform_opinion]
+				data[i, j] = d / 10
 	except KeyboardInterrupt:
 		exit()
 
-	plt.imshow(data, cmap='viridis', interpolation='lanczos')
-	plt.colorbar()
-	plt.xticks(np.arange(0, num_steps, 10), np.round(platform_biases[::10], 2))
-	plt.yticks(np.arange(0, num_steps, 10), np.round(agent_biases[::10], 2))
-	plt.show(block=True)
-
 	os.makedirs('data/platform-vs-agent-bias', exist_ok=True)
-	data_name = f'n{N}-p{P}-c{C}-rec{RB}'
+	data_name = f'p{P}-c{C}-n{N}-{poster_dist}'
 	np.save(f'data/platform-vs-agent-bias/data-{data_name}.npy', data)
 
 
+def plot_plat_vs_agent_bias():
+	a1 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-uniform.npy')
+	a2 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-bimodal.npy')
+	a3 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-centered.npy')
+	a4 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-skewed.npy')
+
+	def plot_model(arr, ax, title):
+		im = ax.imshow(arr, cmap='seismic', interpolation='spline36', origin='lower', vmin=0.4, vmax=1.0)
+		ax.set_title(title, fontsize=12)
+		ax.set_xticks(np.arange(10, 100, 10), np.round(np.linspace(0.2, 1.8, 9), 2), rotation=45)
+		ax.set_yticks(np.arange(10, 100, 10), np.round(np.linspace(0.1, 0.9, 9), 2))
+		return im
+	
+	fig, axs = plt.subplots(2, 2, figsize=(12, 12), sharex=True, sharey=True)
+
+	im1 = plot_model(a1, axs[0, 0], 'Uniform Distribution')
+	plot_model(a2, axs[1, 0], 'Bimodal Distribution')
+	plot_model(a3, axs[0, 1], 'Centered Distribution')
+	plot_model(a4, axs[1, 1], 'Skewed Distribution')
+
+	plt.suptitle('Platform vs Agent Bias for Different Poster Opinion Distributions', fontsize=16)
+	cbax_ax = fig.add_axes([0.92, 0.15, 0.01, 0.7])
+	cbar = fig.colorbar(im1, cax=cbax_ax)
+	cbar.ax.get_yaxis().labelpad = 30
+	cbar.ax.set_ylabel('Proportion of agents aligning with platform opinion', rotation=270, fontsize=12)
+	fig.text(0.5, 0.04, 'Platform Bias / Recommendation Bias, PB / RB', ha='center', fontsize=12)
+	fig.text(0.08, 0.5, 'Agent Bias, B', va='center', rotation='vertical', fontsize=12)
+	plt.show(block=True)
+
 
 if __name__ == '__main__':
-	simulate_platform_vs_agent_bias(100)
+	plot_plat_vs_agent_bias()
