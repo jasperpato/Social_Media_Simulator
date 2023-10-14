@@ -2,26 +2,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from globals import *
 import sys
+import math
 import time
 
 
 class MediaPlatform():
-	def __init__(
-		self,
-		agent_bias=B,
-		posting_agents=P,
-		post_noise=POST_NOISE,
-		prop_posts_consumed=C,
-		platform_bias=PLATFORM_BIAS,
-		rec_bias=RECOMMENDATION_BIAS,
-		verbose=False
-	):
-		self.agent_bias = agent_bias
-		self.posting_agents = posting_agents
-		self.post_noise = post_noise
-		self.prop_posts_consumed = prop_posts_consumed
-		self.platform_bias = platform_bias
-		self.rec_bias = rec_bias
+	def __init__(self, b=B, p=P, n=N, c=C, pb=PB, rb=RB, poster_dist='uniform', verbose=False):
+		self.b = b				# agent bias
+		self.p = p				# proportion of posting agents
+		self.n = n				# standard deviation of Gaussian noise applied to posts
+		self.c = c				# proportion of generated posts consumed per day
+		self.pb = pb			# platform bias
+		self.rb = rb			# recommendation bias
 		self.verbose = verbose
 
 		self.num_posters = round(P * NUM_AGENTS)
@@ -33,11 +25,26 @@ class MediaPlatform():
 		self.m = 0
 		self.c = 0
 
-		if self.agent_bias > 0:
-			self.m = (2 - agent_bias) / (2 * agent_bias)
+		if self.b > 0:
+			self.m = (2 - b) / (2 * b)
 			self.c = 1 - 2 * self.m
 
-		self.agent_opinions = np.random.uniform(-1, 1, NUM_AGENTS)
+		self.agent_opinions = np.zeros(NUM_AGENTS)
+		if poster_dist == 'uniform':
+			self.agent_opinions[:self.num_posters] = np.random.uniform(-1, 1, self.num_posters)
+		else:
+			opinions = np.linspace(-1, 1, 100)
+			if poster_dist == 'bimodal':
+				probs = np.cos((opinions + 1) / 2 * np.pi) ** 2
+			elif poster_dist == 'centered':
+				probs = np.cos(opinions / 2 * np.pi) ** 2
+			elif poster_dist == 'skewed':		# skew away from platform opinion
+				skew_direction = math.copysign(1, self.platform_opinion)
+				probs = np.cos((opinions + skew_direction) / 4 * np.pi) ** 2
+			probs /= np.sum(probs)
+			self.agent_opinions[:self.num_posters] = np.random.choice(opinions, self.num_posters, p=probs)
+			
+		self.agent_opinions[self.num_posters:] = np.random.uniform(-1, 1, NUM_AGENTS - self.num_posters)
 		self.t_agent_opinion = self.agent_opinions.copy()
 		self.prev_opinions = self.agent_opinions.copy()
 
@@ -46,8 +53,8 @@ class MediaPlatform():
 		diff = np.abs(posts - self.agent_opinions)
 		strengthen_probs = np.zeros(NUM_AGENTS)
 		
-		fun1 = diff <= 2 - self.agent_bias
-		fun2 = diff > 2 - self.agent_bias
+		fun1 = diff <= 2 - self.b
+		fun2 = diff > 2 - self.b
 
 		strengthen_probs[fun1] = 1 - diff[fun1] / 2
 		strengthen_probs[fun2] = self.m * diff[fun2] + self.c
@@ -67,7 +74,7 @@ class MediaPlatform():
 		# calculate similarity between creator and platform opinions
 		ctc_platform_sim = 1 - np.abs(ctc - self.platform_opinion) / 2 + sys.float_info.epsilon
             
-		ctc = self.platform_bias * ctc_platform_sim + self.rec_bias * ctc_consumer_sim
+		ctc = self.pb * ctc_platform_sim + self.rb * ctc_consumer_sim
 		ctc = ctc / np.max(ctc, axis=0, keepdims=True)               # normalize with max of each agent's posts
 		ctc[np.diag_indices(self.num_posters)] = 0                        # posters should not consume their own posts
 		return ctc
@@ -78,10 +85,10 @@ class MediaPlatform():
 		Each agent consumes its own served posts
 		'''
 		self.posts = self.agent_opinions[:self.num_posters] 								# posts are the opinions of the posting agents
-		self.posts += np.random.normal(scale=self.post_noise, size=self.posts.shape) 	# add noise to posts
+		self.posts += np.random.normal(scale=self.n, size=self.posts.shape) 	# add noise to posts
 		self.posts = np.clip(self.posts, -1, 1) 									# clip posts to [-1, 1]
 
-		if self.platform_bias or self.rec_bias:
+		if self.pb or self.rb:
 			ctc = self.serve_posts()
 			tiled_posts = np.tile(self.posts, (NUM_AGENTS, 1))
 			sort_order = np.argsort(ctc.T, axis=1)[:, ::-1]
@@ -135,14 +142,14 @@ class MediaPlatform():
 			print(f'Fraction positive {pos}')
 			print(f'Fraction negative {neg}')
 
-		return [pos, neg]
+		return {1: pos, -1: neg}
 	
 
 	def polarisation(self):
 		'''
 		Return polarisation value between [0, 1]
 		'''
-		return min(self.fractions())
+		return min(self.fractions().values())
 
 
 	def graph(self):
@@ -157,7 +164,7 @@ class MediaPlatform():
 if __name__ == '__main__':
 	start_time = time.time()
 	np.random.seed(0)
-	m = MediaPlatform(agent_bias=0)
+	m = MediaPlatform(b=0.3)
 	m.simulate()
 	print(m.fractions())
 	print(m.platform_opinion)
