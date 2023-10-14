@@ -18,7 +18,7 @@ C = 0.1
 D = 0.1
 
 # agent bias
-B = 0
+B = 0.3
 
 # biased platform parameters
 PLATFORM_BIAS = 0
