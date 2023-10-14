@@ -7,7 +7,6 @@ NUM_SIMULATIONS = 500
 POLARISATION_CUTOFF = 0.75	# agents with opinions outside [-cutoff, cutoff] are considered polarised
 CONVERGENCE_NUM = 10		# number of time steps with no change to end the simulation
 
-
 # ----------------- default hyperparameters ---------------------------#
 
 B = 0		# agent bias
