@@ -45,9 +45,9 @@ class MediaPlatform():
 		ctc = ctc + np.reshape(self.posts, (NUM_POSTERS, 1))
              
 		# calculate similarity between creator and consumer opinions
-		ctc_consumer_sim = 2 - np.abs(ctc - self.agent_opinions) + sys.float_info.epsilon
+		ctc_consumer_sim = 1 - np.abs(ctc - self.agent_opinions) / 2 + sys.float_info.epsilon
 		# calculate similarity between creator and platform opinions
-		ctc_platform_sim = 2 - np.abs(ctc - self.platform_opinion) + sys.float_info.epsilon
+		ctc_platform_sim = 1 - np.abs(ctc - self.platform_opinion) / 2 + sys.float_info.epsilon
             
 		ctc = PLATFORM_BIAS * ctc_platform_sim + RECOMMENDATION_BIAS * ctc_consumer_sim
 		ctc = ctc / np.max(ctc, axis=0, keepdims=True)               # normalize with max of each agent's posts
@@ -138,8 +138,8 @@ class MediaPlatform():
 
 if __name__ == '__main__':
 	start_time = time.time()
-	np.random.seed(10)
-	m = MediaPlatform(agent_bias=0.7)
+	np.random.seed(0)
+	m = MediaPlatform(agent_bias=0.3)
 	m.simulate()
 	print(m.fractions())
 	print(m.platform_opinion)
