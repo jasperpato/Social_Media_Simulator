@@ -112,7 +112,7 @@ def simulate_platform_vs_agent_bias(num_steps):
 
 	os.makedirs('data/platform-vs-agent-bias', exist_ok=True)
 	data_name = f'n{N}-p{P}-c{C}-rec{RB}'
-	np.save(f'data/platform-vs-agent-bias/data-{DATA_NAME}.npy', data)
+	np.save(f'data/platform-vs-agent-bias/data-{data_name}.npy', data)
 
 
 
