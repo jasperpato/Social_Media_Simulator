@@ -5,13 +5,13 @@ NUM_TIME_STEPS = 500
 CONVERGENCE_NUM = 10
 
 # proportion of posting agents
-P = 0.75
+P = 0.5
 
 # standard deviation of Gaussian noise applied to posts
 POST_NOISE = 0 # 0.05
 
 # proportion of posts consumed per day
-C = 0.1
+C = 0.5
 
 # change in agent's opinion due to a post
 D = 0.1
