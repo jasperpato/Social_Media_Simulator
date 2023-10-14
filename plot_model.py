@@ -24,7 +24,7 @@ plot_model(1, axs[0, 1])
 plot_model(0.75, axs[1, 0])
 plot_model(0.25, axs[1, 1])
 
-fig.text(0.5, 0.04, 'Difference in opinion, |o1 - o2|', ha='center', fontsize=12)
+fig.text(0.5, 0.04, 'Difference in opinion, d', ha='center', fontsize=12)
 fig.text(0.08, 0.5, 'Probability of strengthening opinion, P(S)', va='center', rotation='vertical', fontsize=12)
 
 plt.savefig('data/bias-model.png', dpi=600, bbox_inches='tight')

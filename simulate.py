@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import os
+import pathlib
 from globals import *
-
 
 DATA_NAME = f'b{B}-p{P}-c{C}-rec{RB}'
 
@@ -31,15 +31,11 @@ def save(fractions, filename):
 		json.dump(data, f, indent=2)
 
 
-def simulate(agent_bias=B, prop_poster=P, 
-			 post_noise=N, prop_consumed_post=C, 
-			 platform_bias=PB, recommendation_bias=RB):
+def simulate(platform_bias):
 	'''
 	Execute an entire simulation
 	'''
-	m = MediaPlatform(agent_bias, prop_poster, 
-					post_noise, prop_consumed_post, 
-					platform_bias, recommendation_bias)
+	m = MediaPlatform(platform_bias=platform_bias)
 	m.simulate()
 	return m
 
@@ -81,8 +77,7 @@ def simulate_platform_bias():
 			print(plat)
 			data[plat] = []
 			for i in range(NUM_SIMULATIONS):
-				m = simulate(pb=plat)
-				results = [int(m.platform_opinion), *[float(f) for f in m.fractions().values()]]
+				results = simulate(plat)
 				data[plat].append(results)
 			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
 
@@ -90,7 +85,11 @@ def simulate_platform_bias():
 		exit()
 
 	print(data)
-	save(data, filename=f'data/platform-vs-polarisation/data-{DATA_NAME}.json')
+
+	save(data, filename=f'data/plat-vs-polarisation/data-{DATA_NAME}.json')
+
+	# backup
+	save(data, filename=pathlib.Path.home() / f'data-{DATA_NAME}.json')
 
 
 def simulate_platform_vs_agent_bias(num_steps):
