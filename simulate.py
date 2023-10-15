@@ -10,9 +10,8 @@ from globals import *
 
 DATA_NAME = f'b{B}-p{P}-c{C}-rec{RB}'
 
-
-def save(fractions, filename):
-	data = {
+def save(data, filename):
+	json_data = {
 		'parameters': {
 			'NUM_AGENTS': NUM_AGENTS,
 			'NUM_TIME_STEPS': NUM_TIME_STEPS,
@@ -26,10 +25,10 @@ def save(fractions, filename):
 			'PB': PB,
 			'RB': RB
 	},
-		'data': fractions
+		'data': data
 	}
 	with open(filename, 'w') as f:
-		json.dump(data, f, indent=2)
+		json.dump(json_data, f, indent=2)
 
 
 def simulate(b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform'):

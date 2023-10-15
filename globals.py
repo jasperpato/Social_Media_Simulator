@@ -1,9 +1,9 @@
 
 # ----------------- simulation parameters ----------------------#
 
-NUM_AGENTS = 5
-NUM_TIME_STEPS = 1
-NUM_SIMULATIONS = 5
+NUM_AGENTS = 500
+NUM_TIME_STEPS = 1000
+NUM_SIMULATIONS = 500
 POLARISATION_CUTOFF = 0.75	# agents with opinions outside [-cutoff, cutoff] are considered polarised
 CONVERGENCE_NUM = 10		# number of time steps with no change to end the simulation
 
