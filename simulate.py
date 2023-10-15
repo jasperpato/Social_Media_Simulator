@@ -45,35 +45,6 @@ def simulate(b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform'):
 	return [int(m.platform_opinion), float(f[1]), float(f[-1])]
 
 
-def variance(lst):
-	avg = sum(lst) / len(lst)
-	return sum([(x - avg)**2 for x in lst]) / len(lst)
-
-
-def plot_bias_vs_polarisation(fractions):
-	'''
-	Plot bias vs polarisation
-	'''
-	x, y = zip(*[(k, round(sum(v) / NUM_SIMULATIONS, 4)) for k, v in fractions.items()])
-
-	_, ax = plt.subplots()
-	ax.plot(x, y)
-	plt.xlabel('Bias')
-	plt.ylabel('Mean Polarisation')
-	plt.savefig(f'data/bias-avg-{DATA_NAME}.png')
-
-	x, y = zip(*[(k, round(variance(v), 4)) for k, v in fractions.items()])
-
-	_, ax = plt.subplots()
-	ax.plot(x, y)
-	plt.xlabel('Bias')
-	plt.ylabel('Polarisation Variance')
-	plt.savefig(f'data/bias-var-{DATA_NAME}.png')
-
-	# plt.show(block=True)
-	# plt.show(block=True)
-
-
 def simulate_platform_bias():
 	data = {}
 	platforms = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
@@ -173,6 +144,4 @@ def plot_plat_vs_agent_bias():
 
 
 if __name__ == '__main__':
-	# plot_plat_vs_agent_bias()
-
-	simulate_rec_bias()
+	plot_plat_vs_agent_bias()
