@@ -38,7 +38,7 @@ def simulate(b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform'):
 	'''
 	m = MediaPlatform(b, p, n, c, d, pb, rb, poster_dist)
 	m.simulate()
-	return m
+	return [int(m.platform_opinion), *[float(f) for f in m.fractions()]]
 
 
 def variance(lst):
@@ -77,7 +77,7 @@ def simulate_platform_bias():
 		for plat in platforms:
 			print(plat)
 			data[plat] = []
-			for i in range(NUM_SIMULATIONS):
+			for _ in range(NUM_SIMULATIONS):
 				results = simulate(plat)
 				data[plat].append(results)
 			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
@@ -87,7 +87,7 @@ def simulate_platform_bias():
 
 	print(data)
 
-	save(data, filename=f'data/plat-vs-polarisation/data-{DATA_NAME}.json')
+	save(data, filename=f'data/platform-vs-polarisation/data-{DATA_NAME}.json')
 
 	# backup
 	save(data, filename=pathlib.Path.home() / f'data-{DATA_NAME}.json')
@@ -144,4 +144,6 @@ def plot_plat_vs_agent_bias():
 
 
 if __name__ == '__main__':
-	plot_plat_vs_agent_bias()
+	# plot_plat_vs_agent_bias()
+
+	simulate_platform_bias()
