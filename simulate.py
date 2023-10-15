@@ -139,7 +139,7 @@ def plot_plat_vs_agent_bias():
 	cbar.ax.set_ylabel('Proportion of agents aligning with platform opinion', rotation=270, fontsize=12)
 	fig.text(0.5, 0.04, 'Platform Bias / Recommendation Bias, PB / RB', ha='center', fontsize=12)
 	fig.text(0.08, 0.5, 'Agent Bias, B', va='center', rotation='vertical', fontsize=12)
-	plt.show(block=True)
+	fig.savefig(f'data/platform-vs-agent-bias/heatmap.png', dpi=600, bbox_inches='tight')
 
 
 if __name__ == '__main__':
