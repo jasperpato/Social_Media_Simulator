@@ -1,3 +1,7 @@
+'''
+Plots the confirmation bias model used for the explanation of our approach
+'''
+
 import matplotlib.pyplot as plt
 import numpy as np
 

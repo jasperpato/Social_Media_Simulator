@@ -1,3 +1,7 @@
+'''
+Runs different experiments and collects data
+'''
+
 from media_platform import MediaPlatform
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -37,7 +41,8 @@ def simulate(b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform'):
 	'''
 	m = MediaPlatform(b, p, n, c, d, pb, rb, poster_dist)
 	m.simulate()
-	return [int(m.platform_opinion), *[float(f) for f in m.fractions()]]
+	f = m.fractions()
+	return [int(m.platform_opinion), float(f[1]), float(f[-1])]
 
 
 def variance(lst):
@@ -77,7 +82,7 @@ def simulate_platform_bias():
 			print(plat)
 			data[plat] = []
 			for _ in range(NUM_SIMULATIONS):
-				results = simulate(plat)
+				results = simulate(pb=plat)
 				data[plat].append(results)
 			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
 
@@ -90,6 +95,31 @@ def simulate_platform_bias():
 
 	# backup
 	save(data, filename=pathlib.Path.home() / f'data-{DATA_NAME}.json')
+
+
+def simulate_rec_bias():
+	data_name = f'b{B}-p{P}-c{C}-platform{PB}'
+
+	data = {}
+	recs = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
+	try:
+		for rec in recs:
+			print(rec)
+			data[rec] = []
+			for _ in range(NUM_SIMULATIONS):
+				results = simulate(rb=rec)
+				data[rec].append(results)
+			# fractions[b] = round(sum(fractions[b]) / NUM_SIMULATIONS, 4)
+
+	except KeyboardInterrupt:
+		exit()
+
+	print(data)
+
+	save(data, filename=f'data/rec-vs-polarisation/data-{data_name}.json')
+
+	# backup
+	save(data, filename=pathlib.Path.home() / f'data-{data_name}.json')
 
 
 def simulate_plat_vs_agent_bias(poster_dist, num_steps=100):
@@ -145,4 +175,4 @@ def plot_plat_vs_agent_bias():
 if __name__ == '__main__':
 	# plot_plat_vs_agent_bias()
 
-	simulate_platform_bias()
+	simulate_rec_bias()
