@@ -1,5 +1,7 @@
 '''
 Runs different experiments and collects data
+Uses the global variables set in globals.py
+Saves results in /data
 
 usage:
 	python3 simulate.py [agent | platform | recommendation | heatmap]

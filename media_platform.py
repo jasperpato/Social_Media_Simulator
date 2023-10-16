@@ -22,6 +22,7 @@ class MediaPlatform():
 		self.d = d				# amount opinions are strengthed/weakened by
 		self.pb = pb			# platform bias
 		self.rb = rb			# recommendation bias
+		
 		self.verbose = verbose
 
 		self.num_posters = round(P * NUM_AGENTS)
@@ -33,24 +34,32 @@ class MediaPlatform():
 		self.m = 0
 		self.c = 0
 
+		# confirmation bias model parameters
 		if self.b > 0:
 			self.m = (2 - b) / (2 * b)
 			self.c = 1 - 2 * self.m
 
 		self.agent_opinions = np.zeros(NUM_AGENTS)
+
 		if poster_dist == 'uniform':
 			self.agent_opinions[:self.num_posters] = np.random.uniform(-1, 1, self.num_posters)
+
 		else:
 			opinions = np.linspace(-1, 1, 100)
 			if poster_dist == 'bimodal':
 				probs = np.cos((opinions + 1) / 2 * np.pi) ** 2
+
 			elif poster_dist == 'centered':
 				probs = np.cos(opinions / 2 * np.pi) ** 2
-			elif poster_dist == 'skewed':		# skew away from platform opinion
+
+			elif poster_dist == 'skewed':
+				# skew away from platform opinion
 				skew_direction = math.copysign(1, self.platform_opinion)
 				probs = np.cos((opinions + skew_direction) / 4 * np.pi) ** 2
+
 			else:
 				raise ValueError('Invalid poster distribution')
+			
 			probs /= np.sum(probs)
 			self.agent_opinions[:self.num_posters] = np.random.choice(opinions, self.num_posters, p=probs)
 			
@@ -71,23 +80,24 @@ class MediaPlatform():
 		strengthen_probs[fun2] = self.m * diff[fun2] + self.c
 
 		strengthened = np.random.random(NUM_AGENTS) < strengthen_probs
-		self.agent_opinions[strengthened] += np.sign(self.agent_opinions[strengthened]) * self.d			# strengthen opinions
-		self.agent_opinions[~strengthened] -= np.sign(self.agent_opinions[~strengthened]) * self.d			# weaken opinions
+		self.agent_opinions[strengthened] += np.sign(self.agent_opinions[strengthened]) * self.d	  # strengthen opinions
+		self.agent_opinions[~strengthened] -= np.sign(self.agent_opinions[~strengthened]) * self.d	# weaken opinions
 		self.agent_opinions = np.clip(self.agent_opinions, -1, 1)
 		
 		
 	def serve_posts(self):
-		ctc = np.zeros((self.num_posters, NUM_AGENTS))  # creator to consumer matrix
+		ctc = np.zeros((self.num_posters, NUM_AGENTS)) # creator to consumer matrix
 		ctc = ctc + np.reshape(self.posts, (self.num_posters, 1))
              
 		# calculate similarity between creator and consumer opinions
 		ctc_consumer_sim = 1 - np.abs(ctc - self.agent_opinions) / 2 + sys.float_info.epsilon
+
 		# calculate similarity between creator and platform opinions
 		ctc_platform_sim = 1 - np.abs(ctc - self.platform_opinion) / 2 + sys.float_info.epsilon
             
 		ctc = self.pb * ctc_platform_sim + self.rb * ctc_consumer_sim
-		ctc = ctc / np.max(ctc, axis=0, keepdims=True)               # normalize with max of each agent's posts
-		ctc[np.diag_indices(self.num_posters)] = 0                        # posters should not consume their own posts
+		ctc = ctc / np.max(ctc, axis=0, keepdims=True) # normalize with max of each agent's posts
+		ctc[np.diag_indices(self.num_posters)] = 0     # posters should not consume their own posts
 		return ctc
 
 
@@ -96,8 +106,8 @@ class MediaPlatform():
 		Each agent consumes its own served posts
 		'''
 		self.posts = self.agent_opinions[:self.num_posters] 								# posts are the opinions of the posting agents
-		self.posts += np.random.normal(scale=self.n, size=self.posts.shape) 	# add noise to posts
-		self.posts = np.clip(self.posts, -1, 1) 									# clip posts to [-1, 1]
+		self.posts += np.random.normal(scale=self.n, size=self.posts.shape) # add noise to posts
+		self.posts = np.clip(self.posts, -1, 1) 														# clip posts to [-1, 1]
 
 		if self.pb or self.rb:
 			ctc = self.serve_posts()
