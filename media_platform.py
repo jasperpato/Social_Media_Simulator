@@ -1,3 +1,10 @@
+'''
+A single instance of a social media simulation
+
+usage:
+	python3 media_platform.py
+'''
+
 import matplotlib.pyplot as plt
 import numpy as np
 from globals import *

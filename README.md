@@ -25,5 +25,5 @@ python3 media_platform.py
 To run many simulations and save the results to file, run:
 
 ```
-python3 simulate.py [platform | recommendation]
+python3 simulate.py [ agent | platform | recommendation | heatmap ]
 ```

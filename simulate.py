@@ -1,11 +1,12 @@
 '''
 Runs different experiments and collects data
+
+usage:
+	python3 simulate.py [agent | platform | recommendation | heatmap]
 '''
 
 from media_platform import MediaPlatform
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-# import matplotlib.gridspec as gridspec
 import numpy as np
 import json
 import os
@@ -43,8 +44,20 @@ def simulate(b=B, p=P, n=N, c=C, d=D, pb=PB, rb=RB, poster_dist='uniform'):
 	return [int(m.platform_opinion), float(f[1]), float(f[-1])]
 
 
+def simulate_agent_bias():
+	bs = [round(i / 100, 2) for i in range(101)]
+	data = {}
+	for b in bs:
+		print(b)
+		data[b] = []
+		for _ in range(NUM_SIMULATIONS):
+			results = simulate(b=b)
+			data[b].append(min(results[1:]))
+	
+	save(data, filename=f'data/bias-vs-polarisation/data-p{P}-c{C}-plat1-rec1.json')
+
+
 def simulate_platform_bias():
-	data_name = f'b{B}-p{P}-c{C}-rec{RB}'
 	data = {}
 	platforms = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
 
@@ -55,11 +68,10 @@ def simulate_platform_bias():
 			results = simulate(pb=plat)
 			data[plat].append(results)
 
-	save(data, filename=f'data/platform-vs-polarisation/data-{data_name}.json')
+	save(data, filename=f'data/platform-vs-polarisation/data-b{B}-p{P}-c{C}-rec{RB}.json')
 
 
 def simulate_rec_bias():
-	data_name = f'b{B}-p{P}-c{C}-platform{PB}'
 	data = {}
 	recs = [round(i / 10, 1) for i in range(0, 51)] # 0-5 in steps of 0.1
 
@@ -70,67 +82,40 @@ def simulate_rec_bias():
 			results = simulate(rb=rec)
 			data[rec].append(results)
 
-	save(data, filename=f'data/rec-vs-polarisation/data-{data_name}.json')
+	save(data, filename=f'data/rec-vs-polarisation/data-b{B}-p{P}-c{C}-platform{PB}.json')
 
 
 def simulate_plat_vs_agent_bias(poster_dist, num_steps=100):
 	data = np.zeros((num_steps, num_steps))
 	agent_biases = np.linspace(0, 1, num_steps)
 	platform_biases = np.linspace(0, 2, num_steps)
-	try:
-		for i, b in enumerate(tqdm(agent_biases)):
-			for j, pb in enumerate(platform_biases):
-				d = 0
-				for _ in range(10):
-					m = simulate(b=b, pb=pb, rb=1, poster_dist=poster_dist)
-					d += m.fractions()[m.platform_opinion]
-				data[i, j] = d / 10
-	except KeyboardInterrupt:
-		exit()
+
+	for i, b in enumerate(tqdm(agent_biases)):
+		for j, pb in enumerate(platform_biases):
+			d = 0
+			for _ in range(10):
+				m = simulate(b=b, pb=pb, rb=1, poster_dist=poster_dist)
+				d += m.fractions()[m.platform_opinion]
+			data[i, j] = d / 10
 
 	os.makedirs('data/platform-vs-agent-bias', exist_ok=True)
-	data_name = f'p{P}-c{C}-n{N}-{poster_dist}'
-	np.save(f'data/platform-vs-agent-bias/data-{data_name}.npy', data)
-
-
-def plot_plat_vs_agent_bias():
-	a1 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-uniform.npy')
-	a2 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-bimodal.npy')
-	a3 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-centered.npy')
-	a4 = np.load('data/platform-vs-agent-bias/data-p0.3-c0.1-n0-skewed.npy')
-
-	def plot_model(arr, ax, title):
-		im = ax.imshow(arr, cmap='seismic', interpolation='spline36', origin='lower', vmin=0.4, vmax=1.0)
-		ax.set_title(title, fontsize=12)
-		ax.set_xticks(np.arange(10, 100, 10), np.round(np.linspace(0.2, 1.8, 9), 2), rotation=45)
-		ax.set_yticks(np.arange(10, 100, 10), np.round(np.linspace(0.1, 0.9, 9), 2))
-		return im
-	
-	fig, axs = plt.subplots(2, 2, figsize=(12, 12), sharex=True, sharey=True)
-
-	im1 = plot_model(a1, axs[0, 0], 'Uniform Distribution')
-	plot_model(a2, axs[1, 0], 'Bimodal Distribution')
-	plot_model(a3, axs[0, 1], 'Centered Distribution')
-	plot_model(a4, axs[1, 1], 'Skewed Distribution')
-
-	plt.suptitle('Platform vs Agent Bias for Different Poster Opinion Distributions', fontsize=16)
-	cbax_ax = fig.add_axes([0.92, 0.15, 0.01, 0.7])
-	cbar = fig.colorbar(im1, cax=cbax_ax)
-	cbar.ax.get_yaxis().labelpad = 30
-	cbar.ax.set_ylabel('Proportion of agents aligning with platform opinion', rotation=270, fontsize=12)
-	fig.text(0.5, 0.04, 'Platform Bias / Recommendation Bias, PB / RB', ha='center', fontsize=12)
-	fig.text(0.08, 0.5, 'Agent Bias, B', va='center', rotation='vertical', fontsize=12)
-	fig.savefig(f'data/platform-vs-agent-bias/heatmap.png', dpi=600, bbox_inches='tight')
+	np.save(f'data/platform-vs-agent-bias/data-p{P}-c{C}-n{N}-{poster_dist}.npy', data)
 
 
 if __name__ == '__main__':
 	import sys
 
-	if 'platform' in sys.argv:
+	if 'agent' in sys.argv:
+		simulate_agent_bias()
+
+	elif 'platform' in sys.argv:
 		simulate_platform_bias()
 	
 	elif 'recommendation' in sys.argv:
 		simulate_rec_bias()
 
+	elif 'heatmap' in sys.argv:
+		simulate_plat_vs_agent_bias()
+
 	else:
-		pass
+		simulate_agent_bias()
